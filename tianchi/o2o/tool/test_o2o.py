@@ -4,6 +4,7 @@ from data.test import *
 import numpy as np
 import os
 import sys
+from xgboost import XGBClassifier
 
 PATH_ROOT = './data/'
 PATH_TARGET = './data/small/'

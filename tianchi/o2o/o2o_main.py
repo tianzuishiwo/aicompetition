@@ -1,4 +1,4 @@
-from hm.o2o.data_manager import DataManager
+from tianchi.o2o.data_manager import DataManager
 import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC

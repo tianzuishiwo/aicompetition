@@ -1,10 +1,10 @@
-from hm.o2o.user import User
+from tianchi.o2o.user import User
 import pandas as pd
 import numpy as np
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.model_selection import train_test_split
-from hm.o2o.o2o_config import *
-from hm.o2o.o2o_tool import *
+from tianchi.o2o.o2o_config import *
+from tianchi.o2o.o2o_tool import *
 
 
 class DataManager(object):
@@ -23,8 +23,8 @@ class DataManager(object):
         self.__str__()
 
     def _load_data(self):
-        self.offline_train_csv = pd.read_csv('./data/small/ccf_offline_stage1_train.csv')
-        self.online_train_csv = pd.read_csv('./data/small/ccf_online_stage1_train.csv')
+        self.offline_train_csv = pd.read_csv(USE_OFFLINE_TRAIN_CSV)
+        self.online_train_csv = pd.read_csv(USE_ONLINE_TRAIN_CSV)
         self.partial_offline_df = self.offline_train_csv.iloc[:OFFLINE_SPLIT_DATA, :]
         self.partial_online_df = self.online_train_csv.iloc[:ONLINE_SPLIT_DATA, :]
         # 加载数据

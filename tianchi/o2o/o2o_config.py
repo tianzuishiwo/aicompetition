@@ -1,6 +1,17 @@
+
+DATA_ROOT = '/Users/wushaohua/my/workplace/ailearn/hm/aicompetition/data/'
+O2O_PATH = DATA_ROOT + 'tianchi/o2o/'
+O2O_SMALL_PATH = O2O_PATH + 'small/'
+
+OFFLINE_TRAIN_NAME = 'ccf_offline_stage1_train.csv'
+ONLINE_TRAIN_NAME = 'ccf_online_stage1_train.csv'
+
+
 # 所有参数配置
 OFFLINE_SPLIT_DATA = 5000
 ONLINE_SPLIT_DATA = 20000
+USE_OFFLINE_TRAIN_CSV = O2O_SMALL_PATH + OFFLINE_TRAIN_NAME
+USE_ONLINE_TRAIN_CSV = O2O_SMALL_PATH + ONLINE_TRAIN_NAME
 
 VALUE_F_1 = -1
 VALUE_0 = 0
