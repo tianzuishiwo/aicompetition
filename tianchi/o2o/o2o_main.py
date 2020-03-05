@@ -18,7 +18,7 @@ pd.set_option('mode.chained_assignment', None)
 # FORMART_FIXED = 'fixed'
 # TRAIN_COLUMNS = ['User_id', 'Merchant_id', 'Action', 'Distance', 'day', 'hour', 'weekday',
 #                  'discount_fixed', 'discount_ratio', 'discount_satisfy', 'sample_type', 'user_type']
-# TRAIN_TARGET_COLUMN = 'use_coupon_15day'
+#  TRAIN_TARGET_COLUMN = 'use_coupon_15day'
 
 
 # def pca_and_train(train_data, train_target_data):

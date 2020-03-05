@@ -23,6 +23,7 @@ def get_target_path(file_path):
 
 def test_split_csv():
     data = pd.read_csv('train_data.csv')
+    print('')
     # data=pd.read_excel('train_data.xls')
     print(f'data.shape={data.shape}')
     pca = PCA(n_components=0.9)
