@@ -1,11 +1,7 @@
 from tianchi.o2o.user import User
-import pandas as pd
-import numpy as np
-from collections import Counter
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.model_selection import train_test_split
-from tianchi.o2o.o2o_config import *
-from tianchi.o2o.o2o_tool import *
+from common.small_tool import *
 
 
 class DataManager(object):
@@ -22,6 +18,9 @@ class DataManager(object):
         self.__str__()
         self._print_data(COUNT)
 
+
+
+    @caltime_p1('csv文件加载数据')
     def _load_data(self):
         self.offline_train_csv = pd.read_csv(USE_OFFLINE_TRAIN_CSV)
         self.online_train_csv = pd.read_csv(USE_ONLINE_TRAIN_CSV)
@@ -31,6 +30,7 @@ class DataManager(object):
         # ccf_offline_stage1_test_revised_csv = pd.read_csv('./data/ccf_offline_stage1_test_revised.csv')
         # sample_submission_csv = pd.read_csv('./data/sample_submission.csv')
 
+    @caltime_p1('handle_data 数据处理')
     def handle_data(self):
         self._print_shape('过采样前')
         self.partial_offline_df = self._handle_under_sample(self.partial_offline_df)
@@ -56,6 +56,7 @@ class DataManager(object):
     def get_train_df(self):
         return self.train_df
 
+    @caltime_p3('删除缺失数据')
     def _drop_na(self, partial_online_df, partial_offline_df):
         partial_online_df.dropna(subset=[COLUMN_Date_received], inplace=True)
         partial_offline_df.dropna(subset=[COLUMN_Date_received], inplace=True)
@@ -64,6 +65,7 @@ class DataManager(object):
     #     return self.target_df
 
     # 合并线上和线下
+    # @caltime_p3('合并线上和线下用户数据')
     def _merge_offline_online(self, offline_data, online_data):
         data_merge = pd.concat([offline_data, online_data], sort=True)
         data_merge[COLUMN_Action].replace(np.NaN, VALUE_F_1, inplace=True)
@@ -81,17 +83,23 @@ class DataManager(object):
         return train_data, train_target_data
 
     #  样本欠采样
+    # @caltime_p2('样本欠采样')
     def _handle_under_sample(self, input_df):
         #     print('过采样前：',input_df.shape)
         date_notna = input_df[COLUMN_Date].notna()
         coupon_notna = input_df[COLUMN_Coupon_id].notna()
         input_df['target'] = np.zeros_like(input_df[COLUMN_Coupon_id].shape[0])
         input_df['target'][date_notna & coupon_notna] = 1
+        print_counter(input_df['target'], 'target成分分析：')
         transfer = RandomUnderSampler()
         x_under, y_under = transfer.fit_resample(input_df, input_df['target'])
+        print(x_under.head(5))
         input_df = x_under.drop('target', axis=1)
+        print(input_df.head(5))
+        print('input_df.shape',input_df.shape)
         return input_df
 
+    # @caltime_p3('添加特征列')
     def _get_user_data(self, partial_offline_df, partial_online_df):
         # offline_user = User(self.partial_offline_df, VALUE_0)
         # online_user = User(self.partial_online_df, VALUE_1)
@@ -101,6 +109,7 @@ class DataManager(object):
         online_user.data_extract()
         return offline_user.get_data(), online_user.get_data()
 
+    @caltime_p2('训练集验证集切分')
     def train_test_split(self, data_pca):
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(data_pca, self.target_df)
 

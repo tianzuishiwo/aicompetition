@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from tianchi.o2o.o2o_config import *
-from tianchi.o2o.o2o_tool import *
+from tianchi.o2o.tool.o2o_tool import *
 
 
 class User(object):

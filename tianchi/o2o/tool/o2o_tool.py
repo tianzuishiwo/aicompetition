@@ -25,11 +25,6 @@ def convert_value(str_value):
     return 0
 
 
-def print_counter(input_df, column_names):
-    for column_name in column_names:
-        counter = Counter(input_df[column_name])
-        print(counter)
-
 
 def column_one_hot(input_df, column_name):
     one_hot_encoder = OneHotEncoder()

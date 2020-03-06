@@ -75,6 +75,24 @@ def caltime_p3(*decorator_param):
 
 
 # 被装饰方法：有参数（无键值对参数）
+def caltime_p4(*decorator_param):
+    def median(func):
+        def inner(p1, p2, p3,p4):
+            des = decorator_param[0]
+            start = time.time()
+            func(p1, p2, p3,p4)
+            end = time.time()
+            delta = end - start
+            if delta < MIN_TIME:
+                delta = 0.0
+            print(f'{des} 耗时：{delta} 秒')
+
+        return inner
+
+    return median
+
+
+# 被装饰方法：有参数（无键值对参数）
 def caltime2(*decorator_param):
     def median(func):
         def inner(*args):

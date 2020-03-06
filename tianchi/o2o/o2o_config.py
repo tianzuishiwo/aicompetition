@@ -11,11 +11,12 @@ ONLINE_TRAIN_NAME = 'ccf_online_stage1_train.csv'
 
 
 # 所有参数配置
-OFFLINE_SPLIT_DATA = 500000*4
+OFFLINE_SPLIT_DATA = 2000000
 ONLINE_SPLIT_DATA = 2000000
 
 # USE_WHICH_DATA = O2O_PATH  # data 下的源数据
 USE_WHICH_DATA = SMALL_PATH  # small 文件下的小数据
+# USE_WHICH_DATA = MEDIAN_PATH  # median 文件下的小数据
 # USE_WHICH_DATA = O2O_PATH
 
 

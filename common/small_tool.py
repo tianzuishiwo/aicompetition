@@ -1,14 +1,28 @@
 import pandas as pd
+import numpy as np
 import os
+from collections import Counter
 from tianchi.o2o.o2o_config import *
 from common.my_decorator import *
+
 
 # SOURCE_PATH = O2O_PATH
 # TARGET_PATH = O2O_SMALL_PATH
 
+def print_counter(series, des="单列成分分析："):
+    series = series.replace(np.NaN, 0)
+    counter = Counter(series)
+    print(des, counter)
+
+
+def print_counter_allcols(input_df, column_names):
+    for column_name in column_names:
+        counter = Counter(input_df[column_name])
+        print(counter)
+
 
 class CsvSpliter(object):
-    def __init__(self, file_name, small, median=None, big=None):
+    def __init__(self, file_name, small, median=None, big=None, load_data=True):
         self.file_name = file_name
         self.small = small
         self.median = median
@@ -17,7 +31,8 @@ class CsvSpliter(object):
         self.small_csv = None
         self.median_csv = None
         self.big_csv = None
-        self.read_csv()
+        if load_data:
+            self.read_csv()
 
     def print_sourcecsv_info(self, print_head=True):
         if self.source_csv is not None:
@@ -66,8 +81,9 @@ class CsvSpliter(object):
         self.generate_new_csv(self.source_csv, self.median, self.get_median_path())
         self.generate_new_csv(self.source_csv, self.big, self.get_big_path())
 
+    @caltime_p4('单份样本切割')
     def generate_new_csv(self, csv, count, target_file):
-        if csv is not None:
+        if csv is not None and (count is not None):
             new_csv = csv.iloc[:count, :]
             new_csv.to_csv(target_file)
             line_count = 30
@@ -78,7 +94,8 @@ class CsvSpliter(object):
             print(f'保留样本完成!')
             print('-' * line_count, '结束', '-' * line_count)
         else:
-            print('csv is null! generate new csv fail!!!')
+            if csv is None:
+                print('csv is null! generate new csv fail!!!')
 
     def _get_join_path(self, dir_path, file_name):
         return os.path.join(dir_path, file_name)
@@ -107,18 +124,37 @@ class CsvSpliter(object):
 #     split_csv(ONLINE_TRAIN_NAME, 5000)
 
 
+SMALL_COUNT = 10 * 10000
+MEDIAN_COUNT = 50 * 10000
+BIG_COUNT = 100 * 10000
+
+
+@caltime_p0('切割所有样本')
 def test_Csv():
-    spliter1 = CsvSpliter(OFFLINE_TRAIN_NAME, 30, 300, 3000)
-    spliter2 = CsvSpliter(ONLINE_TRAIN_NAME, 50, 500, 5000)
-    # spliter1.print_sourcecsv_info()
-    # spliter2.print_sourcecsv_info()
+    # spliter1 = CsvSpliter(OFFLINE_TRAIN_NAME, SMALL_COUNT, MEDIAN_COUNT, BIG_COUNT)
+    # spliter2 = CsvSpliter(ONLINE_TRAIN_NAME, SMALL_COUNT, MEDIAN_COUNT, BIG_COUNT)
+    spliter1 = CsvSpliter(OFFLINE_TRAIN_NAME, SMALL_COUNT, MEDIAN_COUNT)
+    spliter2 = CsvSpliter(ONLINE_TRAIN_NAME, SMALL_COUNT, MEDIAN_COUNT)
+    # spliter1 = CsvSpliter(OFFLINE_TRAIN_NAME, SMALL_COUNT)
+    # spliter2 = CsvSpliter(ONLINE_TRAIN_NAME, SMALL_COUNT)
     spliter1.auto()
     spliter2.auto()
 
 
+def test_counter():
+    spliter1 = CsvSpliter(OFFLINE_TRAIN_NAME, SMALL_COUNT,load_data=False)
+    data = pd.read_csv(spliter1.get_small_path())
+    print(data.shape)
+    print_counter(data[COLUMN_Date])
+    # series=data[COLUMN_Date].replace(np.NaN,0)
+    # counter = Counter(series)
+    # print(counter)
+    # print_counter(data[COLUMN_Date])
+
+
 def main():
     test_Csv()
-
+    # test_counter()
 
 if __name__ == '__main__':
     main()
