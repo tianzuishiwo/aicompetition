@@ -2,18 +2,14 @@ import time
 
 MIN_TIME = 0.01
 
+
 # 被装饰方法：有参数 decorator Y func N
 def caltime_p0(*decorator_param):
     def median(func):
         def inner():
-            des = decorator_param[0]
             start = time.time()
             func()
-            end = time.time()
-            delta = end - start
-            if delta < MIN_TIME:
-                delta = 0.0
-            print(f'>>>>> {des} 耗时：{delta} 秒')
+            print_caltime(start, decorator_param[0])
 
         return inner
 
@@ -24,14 +20,9 @@ def caltime_p0(*decorator_param):
 def caltime_p1(*decorator_param):
     def median(func):
         def inner(p):
-            des = decorator_param[0]
             start = time.time()
             func(p)
-            end = time.time()
-            delta = end - start
-            if delta < MIN_TIME:
-                delta = 0.0
-            print(f'>>>>> {des} 耗时：{delta} 秒')
+            print_caltime(start, decorator_param[0])
 
         return inner
 
@@ -42,14 +33,9 @@ def caltime_p1(*decorator_param):
 def caltime_p2(*decorator_param):
     def median(func):
         def inner(p1, p2):
-            des = decorator_param[0]
             start = time.time()
             func(p1, p2)
-            end = time.time()
-            delta = end - start
-            if delta < MIN_TIME:
-                delta = 0.0
-            print(f'{des} 耗时：{delta} 秒')
+            print_caltime(start, decorator_param[0])
 
         return inner
 
@@ -60,14 +46,9 @@ def caltime_p2(*decorator_param):
 def caltime_p3(*decorator_param):
     def median(func):
         def inner(p1, p2, p3):
-            des = decorator_param[0]
             start = time.time()
             func(p1, p2, p3)
-            end = time.time()
-            delta = end - start
-            if delta < MIN_TIME:
-                delta = 0.0
-            print(f'{des} 耗时：{delta} 秒')
+            print_caltime(start, decorator_param[0])
 
         return inner
 
@@ -77,15 +58,10 @@ def caltime_p3(*decorator_param):
 # 被装饰方法：有参数（无键值对参数）
 def caltime_p4(*decorator_param):
     def median(func):
-        def inner(p1, p2, p3,p4):
-            des = decorator_param[0]
+        def inner(p1, p2, p3, p4):
             start = time.time()
-            func(p1, p2, p3,p4)
-            end = time.time()
-            delta = end - start
-            if delta < MIN_TIME:
-                delta = 0.0
-            print(f'{des} 耗时：{delta} 秒')
+            func(p1, p2, p3, p4)
+            print_caltime(start, decorator_param[0])
 
         return inner
 
@@ -96,14 +72,9 @@ def caltime_p4(*decorator_param):
 def caltime2(*decorator_param):
     def median(func):
         def inner(*args):
-            des = decorator_param[0]
             start = time.time()
             func(args)
-            end = time.time()
-            delta = end - start
-            if delta < MIN_TIME:
-                delta = 0.0
-            print(f'{des} 耗时：{delta} 秒')
+            print_caltime(start, decorator_param[0])
 
         return inner
 
@@ -114,18 +85,22 @@ def caltime2(*decorator_param):
 def caltime3(*decorator_param):
     def median(func):
         def inner(a, *args, **kwargs):
-            des = decorator_param[0]
             start = time.time()
             func(a, args, kwargs)
-            end = time.time()
-            delta = end - start
-            if delta < MIN_TIME:
-                delta = 0.0
-            print(f'{des} 耗时：{delta} 秒')
+            print_caltime(start, decorator_param[0])
 
         return inner
 
     return median
+
+
+def print_caltime(start, des):
+    end = time.time()
+    delta = end - start
+    if delta < MIN_TIME:
+        delta = 0.0
+    delta = round(delta, 2)
+    print(f'>>>>>>>>>> {des} 耗时：{delta} 秒')
 
 # decorator N func N
 # def caltime(func):
