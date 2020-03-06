@@ -3,6 +3,7 @@ import time
 from collections import Counter
 from sklearn.preprocessing import OneHotEncoder
 
+
 def get_stime(input_time):
     # print(f'input_time={input_time}')
     return time.mktime(time.strptime(str(int(input_time)), '%Y%m%d'))

@@ -1,7 +1,10 @@
 
 DATA_ROOT = '/Users/wushaohua/my/workplace/ailearn/hm/aicompetition/data/'
 O2O_PATH = DATA_ROOT + 'tianchi/o2o/'
-O2O_SMALL_PATH = O2O_PATH + 'small/'
+SOURCE_PATH = O2O_PATH + 'source/'
+SMALL_PATH = O2O_PATH + 'small/'
+MEDIAN_PATH = O2O_PATH + 'median/'
+BIG_PATH = O2O_PATH + 'big/'
 
 OFFLINE_TRAIN_NAME = 'ccf_offline_stage1_train.csv'
 ONLINE_TRAIN_NAME = 'ccf_online_stage1_train.csv'
@@ -12,7 +15,7 @@ OFFLINE_SPLIT_DATA = 500000*4
 ONLINE_SPLIT_DATA = 2000000
 
 # USE_WHICH_DATA = O2O_PATH  # data 下的源数据
-USE_WHICH_DATA = O2O_SMALL_PATH # small 文件下的小数据
+USE_WHICH_DATA = SMALL_PATH  # small 文件下的小数据
 # USE_WHICH_DATA = O2O_PATH
 
 
@@ -21,7 +24,7 @@ USE_WHICH_DATA = O2O_SMALL_PATH # small 文件下的小数据
 
 USE_OFFLINE_TRAIN_CSV = USE_WHICH_DATA + OFFLINE_TRAIN_NAME
 USE_ONLINE_TRAIN_CSV = USE_WHICH_DATA + ONLINE_TRAIN_NAME
-COUNT = 5 # log中打印dataframe数量
+COUNT = 5  # log中打印dataframe数量
 
 VALUE_F_1 = -1
 VALUE_0 = 0
