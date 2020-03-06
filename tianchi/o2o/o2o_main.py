@@ -59,6 +59,7 @@ def train_process(x_train, y_train, x_test, y_test):
 def o2o_train():
     data_manager = DataManager()
     data_manager.handle_data()
+    print('pca 特征降维')
     data_pca = pca_dimen_reduce(data_manager.get_train_df())
     data_manager.train_test_split(data_pca)
     data_manager.print_traindf_info()

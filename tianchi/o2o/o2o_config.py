@@ -8,10 +8,20 @@ ONLINE_TRAIN_NAME = 'ccf_online_stage1_train.csv'
 
 
 # 所有参数配置
-OFFLINE_SPLIT_DATA = 5000
-ONLINE_SPLIT_DATA = 20000
-USE_OFFLINE_TRAIN_CSV = O2O_SMALL_PATH + OFFLINE_TRAIN_NAME
-USE_ONLINE_TRAIN_CSV = O2O_SMALL_PATH + ONLINE_TRAIN_NAME
+OFFLINE_SPLIT_DATA = 500000*4
+ONLINE_SPLIT_DATA = 2000000
+
+# USE_WHICH_DATA = O2O_PATH  # data 下的源数据
+USE_WHICH_DATA = O2O_SMALL_PATH # small 文件下的小数据
+# USE_WHICH_DATA = O2O_PATH
+
+
+# USE_OFFLINE_TRAIN_CSV = O2O_SMALL_PATH + OFFLINE_TRAIN_NAME
+# USE_ONLINE_TRAIN_CSV = O2O_SMALL_PATH + ONLINE_TRAIN_NAME
+
+USE_OFFLINE_TRAIN_CSV = USE_WHICH_DATA + OFFLINE_TRAIN_NAME
+USE_ONLINE_TRAIN_CSV = USE_WHICH_DATA + ONLINE_TRAIN_NAME
+COUNT = 5 # log中打印dataframe数量
 
 VALUE_F_1 = -1
 VALUE_0 = 0
@@ -45,10 +55,20 @@ COLUMN_use_coupon_15day = 'use_coupon_15day'
 TRAIN_TARGET_COLUMN = 'use_coupon_15day'
 
 
-TRAIN_COLUMNS = [COLUMN_User_id,COLUMN_Merchant_id,COLUMN_Action,
-                 COLUMN_Distance,COLUMN_day,COLUMN_hour,
-                COLUMN_weekday,COLUMN_discount_fixed,COLUMN_discount_ratio,
-                 COLUMN_discount_satisfy,COLUMN_sample_type,COLUMN_user_type]
+TRAIN_COLUMNS = [
+                 # COLUMN_User_id,
+                 # COLUMN_Merchant_id,
+                 COLUMN_Action,
+                 COLUMN_Distance,
+                 COLUMN_day,
+                 COLUMN_hour,
+                 COLUMN_weekday,
+                 COLUMN_discount_fixed,
+                 COLUMN_discount_ratio,
+                 COLUMN_discount_satisfy,
+                 COLUMN_sample_type,
+                 COLUMN_user_type
+                ]
 
 
 

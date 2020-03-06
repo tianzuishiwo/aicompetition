@@ -1,6 +1,7 @@
 from tianchi.o2o.user import User
 import pandas as pd
 import numpy as np
+from collections import Counter
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.model_selection import train_test_split
 from tianchi.o2o.o2o_config import *
@@ -17,10 +18,9 @@ class DataManager(object):
         self.target_df = None
         self.x_train = None
         self.x_test = None
-        self.y_train = None
-        self.y_test = None
         self._load_data()
         self.__str__()
+        self._print_data(COUNT)
 
     def _load_data(self):
         self.offline_train_csv = pd.read_csv(USE_OFFLINE_TRAIN_CSV)
@@ -32,11 +32,26 @@ class DataManager(object):
         # sample_submission_csv = pd.read_csv('./data/sample_submission.csv')
 
     def handle_data(self):
+        self._print_shape('过采样前')
         self.partial_offline_df = self._handle_under_sample(self.partial_offline_df)
         self.partial_online_df = self._handle_under_sample(self.partial_online_df)
+        self._print_shape('过采样后')
+        self._print_shape('删除缺失数据前')
         self._drop_na(self.partial_online_df, self.partial_offline_df)
-        offline_df, online_df = self._get_user_data(self.partial_online_df, self.partial_offline_df)
-        self.train_df, self.target_df = self._merge_offline_online(offline_df, online_df)
+        self._print_shape('删除缺失数据后')
+        self._print_shape('添加新的特征前')
+        count = 2
+        self._print_data(count, False)
+        # offline_df, online_df = self._get_user_data(self.partial_offline_df, self.partial_online_df)
+        self.partial_offline_df, self.partial_online_df = self._get_user_data(self.partial_offline_df,
+                                                                              self.partial_online_df)
+        self._print_shape('添加新的特征后')
+        self._print_data(count, False)
+        self._print_shape('线上线下合并之前')
+        self.train_df, self.target_df = self._merge_offline_online(self.partial_offline_df, self.partial_online_df)
+        self.print_df('线上线下合并之后', self.train_df, self.target_df)
+        # self._print_shape('线上线下合并之后')
+        # self._print_data(count)
 
     def get_train_df(self):
         return self.train_df
@@ -53,8 +68,16 @@ class DataManager(object):
         data_merge = pd.concat([offline_data, online_data], sort=True)
         data_merge[COLUMN_Action].replace(np.NaN, VALUE_F_1, inplace=True)
         data_merge[COLUMN_Distance].replace(np.NaN, VALUE_F_1, inplace=True)
+        print(f'合并后列: {data_merge.shape}')
+        print('提取待训练特征')
+        print(f'特征列(len={len(TRAIN_COLUMNS)})：{TRAIN_COLUMNS}')
+        print(f'标签列：{TRAIN_TARGET_COLUMN}')
+
         train_data = data_merge[TRAIN_COLUMNS]
         train_target_data = data_merge[TRAIN_TARGET_COLUMN]
+        print('用户分类 ', Counter(train_data[COLUMN_user_type]))
+        print('标签值成分 ', Counter(train_target_data))
+        print('提取待训练特征完成')
         return train_data, train_target_data
 
     #  样本欠采样
@@ -69,7 +92,7 @@ class DataManager(object):
         input_df = x_under.drop('target', axis=1)
         return input_df
 
-    def _get_user_data(self, partial_online_df, partial_offline_df):
+    def _get_user_data(self, partial_offline_df, partial_online_df):
         # offline_user = User(self.partial_offline_df, VALUE_0)
         # online_user = User(self.partial_online_df, VALUE_1)
         offline_user = User(partial_offline_df, VALUE_0)
@@ -88,12 +111,26 @@ class DataManager(object):
         print(f'self.partial_online_df = {self.partial_online_df.shape}')
         return ''
 
-    def _print_data(self):
-        print('打印线上用户前五条数据')
-        print(self.partial_online_df.head(5))
-        print('打印线下用户前五条数据')
-        print(self.partial_offline_df.head(5))
+    def _print_data(self, count, print_detail=True):
+        if print_detail:
+            print(f'打印线上用户前{count}条数据')
+            print(self.partial_online_df.head(count))
+        print(f'线上列名(len={len(self.partial_online_df.columns)})：{self.partial_online_df.columns}')
+        if print_detail:
+            print(f'打印线下用户前{count}条数据')
+            print(self.partial_offline_df.head(count))
+        print(f'线下列名(len={len(self.partial_offline_df.columns)})：{self.partial_offline_df.columns}')
 
-    def print_traindf_info(self):
-        print(f'x_train: {len(self.x_train)}')
-        print(f'x_test: {len(self.x_test)}')
+    def _print_shape(self, des=""):
+        print(f'{des} self.partial_offline_df = { self.partial_offline_df.shape}')
+        print(f'{des} self.partial_online_df = {self.partial_online_df.shape}')
+
+    def print_traindf_info(self, des=""):
+        # print(f'{des} x_train: {len(self.x_train)} , 列数：{len(self.x_train.columns)}')
+        # print(f'{des} x_test: {len(self.x_test)} , 列数：{len(self.x_test.columns)}')
+        print(f'{des} x_train: {len(self.x_train)} ')
+        print(f'{des} x_test: {len(self.x_test)} ')
+
+    def print_df(self, des, train_df, target_df):
+        print(f'{des} train_df = {train_df.shape}')
+        print(f'{des} target_df = {target_df.shape}')
