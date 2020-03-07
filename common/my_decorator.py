@@ -1,6 +1,10 @@
-import time
+import time, datetime
+# from common.small_tool import get_time_now
+from tianchi.o2o.o2o_config import *
 
-MIN_TIME = 0.01
+CALCULATE_START = 'recorde_start'
+CALCULATE_END = 'recorde_end'
+caltime_record = []
 
 
 # 被装饰方法：有参数 decorator Y func N
@@ -94,13 +98,60 @@ def caltime3(*decorator_param):
     return median
 
 
+MIN = 60
+HOUR = 60 * 60
+
+
+def get_delta_des(delta):
+    des = ''
+    if delta < 0.01:
+        des = f'{str(round(delta, 4))}秒'
+        # des = '0.0秒'
+    elif delta < MIN:
+        des = f'{str(round(delta, 2))}秒'
+    else:
+        delta = int(delta)
+        if delta < HOUR:
+            des = f' {str(int(delta / MIN))}分{str(delta % MIN)}秒'
+        else:
+            des = f' {str(int(delta / HOUR))}小时{str(int(delta % HOUR/ MIN))}分{str(delta % MIN)}秒'
+    # print(delta, ' ', des)
+    return des
+
+# get_delta_des(0.00123346)
+# get_delta_des(23.123346)
+# get_delta_des(123.123346)
+# get_delta_des(789.00123346)
+# get_delta_des(2555.00123346)
+# get_delta_des(4590.00123346)
+# get_delta_des(18234.00123346)
+
+
 def print_caltime(start, des):
     end = time.time()
     delta = end - start
-    if delta < MIN_TIME:
-        delta = 0.0
-    delta = round(delta, 2)
-    print(f'>>>>>>>>>> {des} 耗时：{delta} 秒')
+    # if delta < MIN_TIME:
+    #     delta = 0.0
+    # delta = round(delta, 2)
+    delta_des = get_delta_des(delta)
+    func_time_des = f'>>>>>>>>>> {des} 耗时：{delta_des} '
+    print(func_time_des)
+    record(func_time_des)
+
+
+def record(des):
+    if CALCULATE_END in des:
+        # print('+'*30,' ',CALCULATE_END)
+        file_path = LOG_PATH + str(time.time()) + '.txt'
+        # print(file_path)
+        # print(caltime_record)
+        with open(file_path, 'w') as f:
+            for line in caltime_record:
+                f.write(line)
+                f.write('\r\n')
+        caltime_record.clear()
+    caltime_record.append(des)
+    # print('-'*25,'添加日志信息')
 
 # decorator N func N
 # def caltime(func):

@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import os
+import datetime
 from collections import Counter
 from tianchi.o2o.o2o_config import *
 from common.my_decorator import *
@@ -8,6 +9,10 @@ from common.my_decorator import *
 
 # SOURCE_PATH = O2O_PATH
 # TARGET_PATH = O2O_SMALL_PATH
+
+def get_time_now():
+    return datetime.datetime.now()
+
 
 def print_counter(series, des="单列成分分析："):
     series = series.replace(np.NaN, 0)
@@ -124,7 +129,7 @@ class CsvSpliter(object):
 #     split_csv(ONLINE_TRAIN_NAME, 5000)
 
 
-SMALL_COUNT = 10 * 10000
+SMALL_COUNT = 1 * 100
 MEDIAN_COUNT = 50 * 10000
 BIG_COUNT = 100 * 10000
 
@@ -133,10 +138,10 @@ BIG_COUNT = 100 * 10000
 def test_Csv():
     # spliter1 = CsvSpliter(OFFLINE_TRAIN_NAME, SMALL_COUNT, MEDIAN_COUNT, BIG_COUNT)
     # spliter2 = CsvSpliter(ONLINE_TRAIN_NAME, SMALL_COUNT, MEDIAN_COUNT, BIG_COUNT)
-    spliter1 = CsvSpliter(OFFLINE_TRAIN_NAME, SMALL_COUNT, MEDIAN_COUNT)
-    spliter2 = CsvSpliter(ONLINE_TRAIN_NAME, SMALL_COUNT, MEDIAN_COUNT)
-    # spliter1 = CsvSpliter(OFFLINE_TRAIN_NAME, SMALL_COUNT)
-    # spliter2 = CsvSpliter(ONLINE_TRAIN_NAME, SMALL_COUNT)
+    # spliter1 = CsvSpliter(OFFLINE_TRAIN_NAME, SMALL_COUNT, MEDIAN_COUNT)
+    # spliter2 = CsvSpliter(ONLINE_TRAIN_NAME, SMALL_COUNT, MEDIAN_COUNT)
+    spliter1 = CsvSpliter(OFFLINE_TRAIN_NAME, SMALL_COUNT)
+    spliter2 = CsvSpliter(ONLINE_TRAIN_NAME, SMALL_COUNT)
     spliter1.auto()
     spliter2.auto()
 
@@ -152,9 +157,14 @@ def test_counter():
     # print_counter(data[COLUMN_Date])
 
 
+def test_time():
+    print(get_time_now())
+
+
 def main():
     test_Csv()
     # test_counter()
+    # test_time()
 
 if __name__ == '__main__':
     main()

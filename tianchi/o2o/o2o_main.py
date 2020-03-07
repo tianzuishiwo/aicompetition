@@ -24,6 +24,7 @@ def train_process(x_train, y_train, x_test, y_test):
     model_controller = ModelController(x_train, y_train, x_test, y_test)
     model_controller.train()
 
+
 # @caltime_p4('模型训练')
 # def train_process(x_train, y_train, x_test, y_test):
 #     svm = SVC()
@@ -53,8 +54,14 @@ def o2o_train():
     data_manager.__str__()
 
 
+@caltime_p0(CALCULATE_END)
+def write_log():
+    print('项目运行完成,打印记录信息')
+
+
 def main():
     o2o_train()
+    write_log()
 
 
 if __name__ == '__main__':

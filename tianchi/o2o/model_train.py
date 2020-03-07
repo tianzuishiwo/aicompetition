@@ -5,7 +5,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from xgboost import XGBClassifier
 
-# from sklearn.linear_model import  LinearRegression
 
 from sklearn.metrics import roc_auc_score
 from common.my_decorator import *
@@ -93,7 +92,7 @@ class ModelController(object):
 
     def print_auc(self, model_des, accuracy, auc):
         print(FORMAT_ARROW, '使用模型：', model_des)
-        print(FORMAT_ARROW, f'训练数据：{len(self.x_train)}', f' 测试数据={len(self.x_test)}')
+        print(FORMAT_ARROW, f'训练数据：{len(self.x_train)}', f' 验证数据:{len(self.x_test)}')
         print(FORMAT_ARROW, '准确率：', accuracy)
         print(FORMAT_ARROW, 'auc：', auc)
         self.record_dict[model_des] = auc
