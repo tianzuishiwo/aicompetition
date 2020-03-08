@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 
+from sklearn.externals import joblib
 from sklearn.model_selection import train_test_split
 from common.my_decorator import *
 from hm.ml.houserent.data_manager import *
@@ -96,14 +97,31 @@ def test_train():
     controller.run()
 
 
-def test_train_load_testdf():
-    model = MyModel()
-    model.load_model_trian()
+# def test_train_load_testdf():
+#     model = MyModel()
+#     model.load_model_trian()
+
+MODE_NAME = 'randomForestRegressor_1583689687.pkl'
+
+
+def load_pkl_and_predict():
+    estimator = joblib.load(RENT_PKL_PATH + MODE_NAME)
+    testpd = pd.read_csv(USE_TEST_CSV, encoding='utf-8')
+    X_test_id = testpd[COL_order_]
+    X_test = testpd.drop([COL_order_, COL_index], axis=1)
+    y_predict = estimator.predict(X_test)
+    result_df = pd.DataFrame(X_test_id)
+    result_df['月租金'] = y_predict
+    print(f'测试结果文件shape： {result_df.shape}')
+    print(f'测试结果文件columns： {result_df.columns}')
+    path = RENT_RESULT_PATH + 'local_pkl_' + str(int(time.time())) + '_' + RENT_RESULT_NAME
+    result_df.to_csv(path, encoding='utf-8')
+    print('本地加载模型，预测测试集数据完成！ (列名存在编码异常！！！)')
 
 
 def main():
     test_train()
-    # test_train_load_testdf()
+    # load_pkl_and_predict()
 
 
 if __name__ == '__main__':

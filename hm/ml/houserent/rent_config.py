@@ -5,6 +5,7 @@ RENT_SOURCE_PATH = RENT_PATH + 'source/'
 RENT_SMALL_PATH = RENT_PATH + 'small/'
 RENT_TRAIN_PATH = RENT_PATH + 'train/'
 RENT_RESULT_PATH = RENT_PATH + 'result/'
+RENT_PKL_PATH = RENT_PATH + 'pkl/'
 
 RENT_TRAIN_NAME = 'train.csv'
 RENT_TEST_NAME = 'test.csv'
