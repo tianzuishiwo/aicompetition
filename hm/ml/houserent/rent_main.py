@@ -123,8 +123,8 @@ def load_pkl_and_predict():
 
 
 def main():
-    # test_train()
-    load_pkl_and_predict()
+    test_train()
+    # load_pkl_and_predict()
 
 
 if __name__ == '__main__':

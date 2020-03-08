@@ -14,6 +14,7 @@ FORMAT_ARROW = '-' * 20 + '> '
 
 pd.set_option('mode.chained_assignment', None)
 
+
 # RENT_RESULT_NAME_PATH
 
 class BaseModel(object):
@@ -27,6 +28,12 @@ class BaseModel(object):
         print(FORMAT_ARROW, '准确率：', accuracy)
         print(FORMAT_ARROW, '均平方根误差：', result)
         # self.record_dict[model_des] = auc
+
+    def is_all_traindata(self):
+        # self.dataset.x_train
+        if self.dataset.x_train.shape[0] > 10 * 10000:
+            return True
+        return False
 
     def get_result_csv_path(self):
         path = RENT_RESULT_PATH + str(int(time.time())) + '_' + RENT_RESULT_NAME
@@ -47,7 +54,10 @@ class BaseModel(object):
                 print('暂不打印结果文件！')
 
     def _save_model(self, estimator):
-        model_name = f'{self.model_name}_{str(int(time.time()))}.pkl'
+        all_data_des = ''
+        if self.is_all_traindata():
+            all_data_des = '_all_data'
+        model_name = f'{self.model_name + all_data_des}_{str(int(time.time()))}.pkl'
         path = RENT_PKL_PATH + model_name
         joblib.dump(estimator, path)
         print(f'{self.model_name} 训练模型保存完成！')

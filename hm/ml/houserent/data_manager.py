@@ -118,13 +118,12 @@ class FeatureExtractor(BaseDataHandle):
     def handle(self):
         self.feature_str2int(COL_home_direct)
 
-        # self.col_one_hot(COL_home_direct)
-        # self.col_one_hot(COL_floor)
-        # self.col_one_hot(COL_time)
-        # self.col_one_hot(COL_reside_state)
-        # self.col_one_hot(COL_rent_type)
-        # self.col_one_hot(COL_metro_num)
-        # self.col_one_hot(COL_decorate_situation)
+        # time home_direct 不能onehot，因为测试集可分类型与训练集不一致
+        self.col_one_hot(COL_floor)
+        self.col_one_hot(COL_reside_state)
+        self.col_one_hot(COL_rent_type)
+        self.col_one_hot(COL_metro_num)
+        self.col_one_hot(COL_decorate_situation)
 
         # self.add_home_type()
         pass
