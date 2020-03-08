@@ -6,6 +6,7 @@ from collections import Counter
 from tianchi.o2o.o2o_config import *
 from common.my_decorator import *
 from hm.ml.pubg.pubg_config import *
+from hm.ml.houserent.rent_config import *
 
 
 # SOURCE_PATH = O2O_PATH
@@ -168,8 +169,10 @@ def test_Csv():
     # spliter2 = CsvSpliter(ONLINE_TRAIN_NAME, SMALL_COUNT, MEDIAN_COUNT, BIG_COUNT)
     # spliter1 = CsvSpliter(OFFLINE_TRAIN_NAME, SMALL_COUNT, MEDIAN_COUNT)
     # spliter2 = CsvSpliter(ONLINE_TRAIN_NAME, SMALL_COUNT, MEDIAN_COUNT)
-    spliter1 = CsvSpliter(PUBG_TRAIN_NAME, SMALL_COUNT, source_path=PUBG_SOURCE_PATH, small_path=PUBG_SMALL_PATH)
-    spliter2 = CsvSpliter(PUBG_TEST_NAME, SMALL_COUNT, source_path=PUBG_SOURCE_PATH, small_path=PUBG_SMALL_PATH)
+    # spliter1 = CsvSpliter(PUBG_TRAIN_NAME, SMALL_COUNT, source_path=PUBG_SOURCE_PATH, small_path=PUBG_SMALL_PATH)
+    # spliter2 = CsvSpliter(PUBG_TEST_NAME, SMALL_COUNT, source_path=PUBG_SOURCE_PATH, small_path=PUBG_SMALL_PATH)
+    spliter1 = CsvSpliter(RENT_TRAIN_NAME, SMALL_COUNT, source_path=RENT_SOURCE_PATH, small_path=RENT_SMALL_PATH)
+    spliter2 = CsvSpliter(RENT_TEST_NAME, SMALL_COUNT, source_path=RENT_SOURCE_PATH, small_path=RENT_SMALL_PATH)
     spliter1.auto()
     spliter2.auto()
 
