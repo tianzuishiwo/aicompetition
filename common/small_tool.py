@@ -5,6 +5,7 @@ import datetime
 from collections import Counter
 from tianchi.o2o.o2o_config import *
 from common.my_decorator import *
+from hm.ml.pubg.pubg_config import *
 
 
 # SOURCE_PATH = O2O_PATH
@@ -27,7 +28,7 @@ def print_counter_allcols(input_df, column_names):
 
 
 class CsvSpliter(object):
-    def __init__(self, file_name, small, median=None, big=None, load_data=True):
+    def __init__(self, file_name, small, median=None, big=None, load_data=True, source_path=None, small_path=None):
         self.file_name = file_name
         self.small = small
         self.median = median
@@ -36,6 +37,11 @@ class CsvSpliter(object):
         self.small_csv = None
         self.median_csv = None
         self.big_csv = None
+        self.source_path = source_path
+        self.small_path = small_path
+        self.median_path = None
+        self.big_path = None
+        # self.set_path(SOURCE_PATH, SMALL_PATH, MEDIAN_PATH, BIG_PATH)
         if load_data:
             self.read_csv()
 
@@ -50,8 +56,10 @@ class CsvSpliter(object):
     def read_csv(self):
         self.source_csv = pd.read_csv(self.get_source_path())
         self.small_csv = self._csv_split(self.source_csv, self.small)
-        self.median_csv = self._csv_split(self.source_csv, self.median)
-        self.big_csv = self._csv_split(self.source_csv, self.big)
+        if self.median_path is not None:
+            self.median_csv = self._csv_split(self.source_csv, self.median)
+        if self.big_path is not None:
+            self.big_csv = self._csv_split(self.source_csv, self.big)
 
     def _csv_split(self, source_csv, pos):
         if pos is not None:
@@ -62,29 +70,39 @@ class CsvSpliter(object):
         self.print_sourcecsv_info(False)
         self.print_csv('source', self.source_csv)
         self.print_csv('samll', self.small_csv)
-        self.print_csv('median', self.median_csv)
-        self.print_csv('big', self.big_csv)
+        if self.median_path_not_empty():
+            self.print_csv('median', self.median_csv)
+        if self.big_path_not_empty():
+            self.print_csv('big', self.big_csv)
 
     def print_csv(self, des, csv):
         if csv is not None:
             print(f' {des}: shape={csv.shape} size={csv.size}')
 
     def get_source_path(self):
-        return self._get_join_path(SOURCE_PATH, self.file_name)
+        return self._get_join_path(self.source_path, self.file_name)
 
     def get_small_path(self):
-        return self._get_join_path(SMALL_PATH, self.file_name)
+        return self._get_join_path(self.small_path, self.file_name)
 
     def get_median_path(self):
-        return self._get_join_path(MEDIAN_PATH, self.file_name)
+        return self._get_join_path(self.median_path, self.file_name)
 
     def get_big_path(self):
-        return self._get_join_path(BIG_PATH, self.file_name)
+        return self._get_join_path(self.big_path, self.file_name)
 
     def generate_all_csv(self):
         self.generate_new_csv(self.source_csv, self.small, self.get_small_path())
-        self.generate_new_csv(self.source_csv, self.median, self.get_median_path())
-        self.generate_new_csv(self.source_csv, self.big, self.get_big_path())
+        if self.median_path_not_empty():
+            self.generate_new_csv(self.source_csv, self.median, self.get_median_path())
+        if self.big_path_not_empty():
+            self.generate_new_csv(self.source_csv, self.big, self.get_big_path())
+
+    def median_path_not_empty(self):
+        return self.median_path is not None
+
+    def big_path_not_empty(self):
+        return self.big_path is not None
 
     @caltime_p4('单份样本切割')
     def generate_new_csv(self, csv, count, target_file):
@@ -110,6 +128,16 @@ class CsvSpliter(object):
         self.generate_all_csv()
         self.print_all_info()
 
+    def set_path(self, source_path, small_path, median_path=None, big_path=None):
+        self.source_path = source_path
+        self.small_path = small_path
+        self.median_path = median_path
+        self.big_path = big_path
+        # self.source_path = SOURCE_PATH
+        # self.small_path = SMALL_PATH
+        # self.median_path = MEDIAN_PATH
+        # self.big_path = BIG_PATH
+
 
 # def split_csv(file_name, copy_count):
 #     print('*' * 25, ' start ', '*' * 25)
@@ -129,7 +157,7 @@ class CsvSpliter(object):
 #     split_csv(ONLINE_TRAIN_NAME, 5000)
 
 
-SMALL_COUNT = 1 * 100
+SMALL_COUNT = 1 * 10000
 MEDIAN_COUNT = 50 * 10000
 BIG_COUNT = 100 * 10000
 
@@ -140,14 +168,14 @@ def test_Csv():
     # spliter2 = CsvSpliter(ONLINE_TRAIN_NAME, SMALL_COUNT, MEDIAN_COUNT, BIG_COUNT)
     # spliter1 = CsvSpliter(OFFLINE_TRAIN_NAME, SMALL_COUNT, MEDIAN_COUNT)
     # spliter2 = CsvSpliter(ONLINE_TRAIN_NAME, SMALL_COUNT, MEDIAN_COUNT)
-    spliter1 = CsvSpliter(OFFLINE_TRAIN_NAME, SMALL_COUNT)
-    spliter2 = CsvSpliter(ONLINE_TRAIN_NAME, SMALL_COUNT)
+    spliter1 = CsvSpliter(PUBG_TRAIN_NAME, SMALL_COUNT, source_path=PUBG_SOURCE_PATH, small_path=PUBG_SMALL_PATH)
+    spliter2 = CsvSpliter(PUBG_TEST_NAME, SMALL_COUNT, source_path=PUBG_SOURCE_PATH, small_path=PUBG_SMALL_PATH)
     spliter1.auto()
     spliter2.auto()
 
 
 def test_counter():
-    spliter1 = CsvSpliter(OFFLINE_TRAIN_NAME, SMALL_COUNT,load_data=False)
+    spliter1 = CsvSpliter(OFFLINE_TRAIN_NAME, SMALL_COUNT, load_data=False)
     data = pd.read_csv(spliter1.get_small_path())
     print(data.shape)
     print_counter(data[COLUMN_Date])
@@ -165,6 +193,7 @@ def main():
     test_Csv()
     # test_counter()
     # test_time()
+
 
 if __name__ == '__main__':
     main()
