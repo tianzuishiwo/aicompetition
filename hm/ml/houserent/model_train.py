@@ -1,5 +1,7 @@
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
+from xgboost import XGBRegressor
+import lightgbm as lgb
 import numpy as np
 import pandas as pd
 import time
@@ -38,7 +40,6 @@ class BaseModel(object):
             result_df['月租金'] = y_predict
             print(f'测试结果文件shape： {result_df.shape}')
             print(f'测试结果文件columns： {result_df.columns}')
-            # y_pre_df = pd.DataFrame(y_predict)
             if OUTPUT_RESULT_ENABLE:
                 result_df.to_csv(self.get_result_csv_path())
             else:
@@ -54,11 +55,8 @@ class BaseModel(object):
         self._to_result_csv(estimator)
         self._save_model(estimator)
 
-
-class MySvm(BaseModel):
-    pass
-    # def __init__(self):
-    #     pass
+    def rmse(self, y, y_pre):
+        return np.sqrt(mean_absolute_error(y, y_pre))
 
 
 class MyRandomForestRegressor(BaseModel):
@@ -69,13 +67,53 @@ class MyRandomForestRegressor(BaseModel):
         estimator.fit(self.dataset.x_train, self.dataset.y_train)
         y_pre = estimator.predict(self.dataset.x_valid)
         accuray = estimator.score(self.dataset.x_valid, self.dataset.y_valid)
-        result = np.sqrt(mean_absolute_error(self.dataset.y_valid, y_pre))
+        # result = np.sqrt(mean_absolute_error(self.dataset.y_valid, y_pre))
+        result = self.rmse(self.dataset.y_valid, y_pre)
         # 测试集 预测标签值
         # if self.dataset.
         # self.to_result_csv()
-        self.print_result('MyRandomForestRegressor', accuray, result)
+        self.print_result(self.model_name, accuray, result)
         self.save_and_result(estimator)
 
+
+class MyLGBMRegressor(BaseModel):
+
+    @caltime_p1('LGBMRegressor训练')
+    def train(self):
+        estimator = lgb.LGBMRegressor(objective="regression", num_leaves=31, learning_rate=0.05, n_estimators=20)
+        estimator.fit(self.dataset.x_train, self.dataset.y_train,
+                      eval_set=[(self.dataset.x_valid, self.dataset.y_valid)], eval_metric="l1", early_stopping_rounds=5)
+        # estimator = lgb.LGBMRegressor(boosting_type='gbdt',
+        #                               num_leaves=31,
+        #                               max_depth=5,
+        #                               learning_rate=0.1,
+        #                               n_estimators=100,
+        #                               min_child_samples=20,
+        #                               n_jobs=-1
+        #                               )
+        # estimator.fit(self.dataset.x_train, self.dataset.y_train,
+        #               eval_set=[(self.dataset.x_valid, self.dataset.y_valid)],
+        #               eval_metric='l1',
+        #               early_stopping_rounds=5)
+        accuracy = estimator.score(self.dataset.x_valid, self.dataset.y_valid)
+        y_valid_pre = estimator.predict(self.dataset.x_valid)
+        result = self.rmse(self.dataset.y_valid, y_valid_pre)
+        self.print_result(self.model_name, accuracy, result)
+        self.save_and_result(estimator)
+
+class MyXgboost(BaseModel):
+
+    @caltime_p1('Xgboost训练')
+    def train(self):
+        estimator = XGBRegressor(learning_rate=0.1, n_estimators=550, max_depth=4, min_child_weight=5, seed=0,
+                                 subsample=0.7, colsample_bytree=0.7, gamma=0.1, reg_alpha=1, reg_lambda=1)
+        estimator.fit(self.dataset.x_train, self.dataset.y_train)
+        accuracy = estimator.score(self.dataset.x_valid, self.dataset.y_valid)
+        y_valid_pre = estimator.predict(self.dataset.x_valid)
+        result = self.rmse(self.dataset.y_valid, y_valid_pre)
+        self.print_result(self.model_name, accuracy, result)
+        self.save_and_result(estimator)
+        pass
 
 class MyModel(object):
 
@@ -84,7 +122,7 @@ class MyModel(object):
         self.is_load = is_load
 
     def train(self):
-        MyRandomForestRegressor(self.dataset, 'randomForestRegressor').train()
+        # MyRandomForestRegressor(self.dataset, 'randomForestRegressor').train()
+        # MyLGBMRegressor(self.dataset, 'LGBMRegressor').train()
+        MyXgboost(self.dataset, 'Xgboost').train()
 
-    def load_model_trian(self):
-        pass

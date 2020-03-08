@@ -21,6 +21,7 @@ USE_TEST_CSV = RENT_TRAIN_PATH + 'test_small.csv'
 # USE_TRAIN_CSV = RENT_TRAIN_PATH + 'train.csv'
 # USE_TEST_CSV = RENT_SOURCE_PATH + 'test.csv'
 
+pd.set_option('mode.chained_assignment', None)
 
 class DataSet(object):
     def __init__(self):
@@ -77,7 +78,6 @@ class PubgController(object):
         self.train_pre_process()
         self.dataset.__str__()
         self.test_pre_process()
-
         model = MyModel(self.dataset)
         model.train()
 
