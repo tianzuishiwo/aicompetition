@@ -5,7 +5,7 @@ import time
 from hm.ml.pubg.pubg_config import *
 from common.my_decorator import *
 
-COL_ID = 'id'  # 用户id ---> 统计多少玩家
+COL_ID = 'Id'  # 用户id ---> 统计多少玩家
 COL_groupId = 'groupId'  # 所处小队id
 COL_matchId = 'matchId'  # 该场比赛id
 COL_assists = 'assists'  # 助攻数

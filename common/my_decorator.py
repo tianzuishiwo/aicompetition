@@ -136,7 +136,7 @@ def print_caltime(start, des):
     delta_des = get_delta_des(delta)
     func_time_des = f'>>>>>>>>>> {des} 耗时：{delta_des} '
     print(func_time_des)
-    record(func_time_des)
+    # record(func_time_des)
 
 
 def record(des):

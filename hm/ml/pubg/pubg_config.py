@@ -5,7 +5,7 @@ PUBG_SMALL_PATH = PUBG_PATH + 'small/'
 PUBG_TRAIN_PATH = PUBG_PATH + 'train/'
 
 PUBG_TRAIN_NAME = 'train_V2.csv'
-PUBG_TEST_NAME = 'test_V2.csv'
+PUBG_TEST_NAME = 'small_test_V2.csv'
 
 # 源文件
 # USE_TRAIN_PATH = PUBG_SOURCE_PATH + PUBG_TRAIN_NAME
