@@ -27,8 +27,17 @@ COL_metro_station = 'metro_station'
 COL_distance = 'distance'
 COL_decorate_situation = 'decorate_situation'
 COL_month_fee = 'month_fee'
+
 # 以下新增
+COL_room_area = 'room_area'
+COL_total_rtp = 'total_room_toilet_parlor'  # 房+卫+厅
+COL_room_rate = 'room_rate'  # 房/总
+COL_toilet_rate = 'toilet_rate'  # 卫/总
+COL_parlor_rate = 'parlor_rate'  # 厅/总
+COL_floor_rate = 'floor_rate'  # 楼层比
 COL_home_type = 'home_type'  # 户型
+COL_metro_exist = 'metro_exist'  # 有地铁
+
 
 # COL_ = ''
 
@@ -49,6 +58,30 @@ COLUMNS_TEST = [
     COL_metro_num, COL_metro_station, COL_distance, COL_decorate_situation,
     # COL_month_fee,
 ]
+
+"""
+# ['Unnamed: 0', '时间', '小区名', '小区房屋出租数量', '楼层',
+#  '总楼层', '房屋面积', '房屋朝向','居住状态', '卧室数量',
+#  '厅的数量', '卫的数量', '出租方式', '区', '位置',
+#  '地铁线路', '地铁站点', '距离','装修情况', '月租金']
+
+x_columns=['时间', '新小区名', '小区房屋出租数量', '楼层', '总楼层', '房屋面积','居住状态', '卧室数量',
+       '厅的数量', '卫的数量', '出租方式', '区', '位置', '地铁线路', '地铁站点', '距离', '装修情况', 
+       '新朝向', '房+卫+厅', '房/总', '卫/总', '厅/总', '卧室面积', '楼层比', '户型','平均值特征1',
+       '平均值特征2','有地铁','小区线路数','位置线路数','小区条数大于100','小区平均值特征','朝向平均值特征',
+           '站点平均值特征','位置平均值特征']
+           
+           '新小区名', '小区房屋出租数量','新朝向','房+卫+厅', '房/总', '卫/总', '厅/总','卧室面积','户型','平均值特征1',
+       '平均值特征2','有地铁','小区线路数','位置线路数','小区条数大于100','小区平均值特征','朝向平均值特征',
+           '站点平均值特征','位置平均值特征'
+           
+           '小区线路数'(4),'位置线路数'(4),
+           
+           '有地铁'(2,3,4),
+           '房+卫+厅'(4),
+           '卧室面积'(4),
+           
+"""
 
 
 class BaseDataHandle(object):
@@ -125,18 +158,43 @@ class FeatureExtractor(BaseDataHandle):
         self.col_one_hot(COL_metro_num)
         self.col_one_hot(COL_decorate_situation)
 
-        # self.add_home_type()
+        self.add_room_area()
+        self.add_total_rtp()
+        self.add_room_rate()
+        self.add_toilet_rate()
+        self.add_parlor_rate()
+        # self.add_floor_rate() # 楼层比先屏蔽
+        self.add_home_type()
+        self.add_metro_exist()
         pass
 
     def add_home_type(self):
-        # 户型
-        # self.data[COL_home_type] = self.data[COL_order_] # 训练集没有'id'，可用index代替
-        # for index in self.data[COL_home_type].values:
-        #     self.data[COL_home_type][index] = self.data[COL_room_count][index] + ',' + self.data[COL_parlor_count][
-        #         index] + ',' + self.data[COL_toilet_count][index]
-        # self.feature_str2int(COL_home_type)
+        # train['户型'] = train[['卧室数量', '厅的数量', '卫的数量']].
+        # apply(lambda x: str(x['卧室数量']) + str(x['厅的数量']) + str(x['卫的数量']),axis=1)
+        self.data[COL_home_type] = self.data[[COL_room_count, COL_parlor_count, COL_toilet_count]] \
+            .apply(lambda x: str(x[COL_room_count]) + str(x[COL_parlor_count]) + str(x[COL_toilet_count]), axis=1)
 
-        pass
+    def add_room_area(self):
+        #  data['room_area'] = data['home_area']/(data['room_count']+1)
+        self.data[COL_room_area] = self.data[COL_home_area] / (self.data[COL_room_count] + 1)
+
+    def add_total_rtp(self):
+        self.data[COL_total_rtp] = self.data[COL_room_count] + self.data[COL_toilet_count] + self.data[COL_parlor_count]
+
+    def add_room_rate(self):
+        self.data[COL_room_rate] = self.data[COL_room_count] / (self.data[COL_total_rtp] + 1)
+
+    def add_toilet_rate(self):
+        self.data[COL_toilet_rate] = self.data[COL_toilet_count] / (self.data[COL_total_rtp] + 1)
+
+    def add_parlor_rate(self):
+        self.data[COL_parlor_rate] = self.data[COL_parlor_count] / (self.data[COL_total_rtp] + 1)
+
+    def add_floor_rate(self):
+        self.data[COL_floor_rate] = self.data[COL_floor] / (self.data[COL_total_floor] + 1)
+
+    def add_metro_exist(self):
+        self.data[COL_metro_exist] = (self.data[COL_metro_station] > -1).map(int)
 
 
 class ElseHander(BaseDataHandle):

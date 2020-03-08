@@ -118,6 +118,42 @@ class MyXgboost(BaseModel):
 
     @caltime_p1('Xgboost训练')
     def train(self):
+        """
+        # cv_params = {'n_estimators': [400, 500, 600, 700, 800]}
+
+         #4.设置训练参数
+    param = {'max_depth':5,
+             'eta':0.01,
+             'verbosity':1,
+             'objective':'reg:linear',
+             'silent': 1,
+             'gamma': 0.01,
+             'min_child_weight': 1,
+            }
+
+    params={
+    "objective":'reg:linear',
+    'eta':0.01,
+    'gamma': 0.05,
+    'silent': 1,
+    'max_depth':25,
+    'min_child_weight':0.5,
+    'sub_sample':0.6,
+    'reg_alpha':0.5,
+    'reg_lambda':0.8,
+    'colsample_bytree':0.5
+}
+
+        params_dict={
+    "objective":'reg:linear',
+    'eta':[0.01,0.1,0.5],
+    'gamma': [0.01,0.05,0.1],
+    'silent': 1,
+    'max_depth':[15,25,35],
+    'min_child_weight':[0.5,1,3],
+}
+        :return:
+        """
         estimator = XGBRegressor(learning_rate=0.1, n_estimators=550, max_depth=4, min_child_weight=5, seed=0,
                                  subsample=0.7, colsample_bytree=0.7, gamma=0.1, reg_alpha=1, reg_lambda=1)
         estimator.fit(self.dataset.x_train, self.dataset.y_train)
@@ -126,6 +162,7 @@ class MyXgboost(BaseModel):
         result = self.rmse(self.dataset.y_valid, y_valid_pre)
         self.print_result(self.model_name, accuracy, result)
         self.save_and_result(estimator)
+
         pass
 
 
