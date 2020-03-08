@@ -34,7 +34,7 @@ COL_home_type = 'home_type'  # 户型
 
 COLUMNS_TRAIN = [
     # COL_order_,
-    COL_index,
+    # COL_index,
     COL_time, COL_area, COL_area_rent_count, COL_floor,
     COL_total_floor, COL_home_area, COL_home_direct, COL_reside_state, COL_room_count,
     COL_parlor_count, COL_toilet_count, COL_rent_type, COL_district, COL_location,
@@ -42,7 +42,7 @@ COLUMNS_TRAIN = [
 ]
 
 COLUMNS_TEST = [
-    COL_index,
+    # COL_index,
     COL_order_, COL_time, COL_area, COL_area_rent_count, COL_floor,
     COL_total_floor, COL_home_area, COL_home_direct, COL_reside_state, COL_room_count,
     COL_parlor_count, COL_toilet_count, COL_rent_type, COL_district, COL_location,
@@ -77,6 +77,9 @@ class BaseDataHandle(object):
         # 删除行，根据空数据
         self.data.drop(self.data[col_name][self.data[col_name].isna()].index, axis=0, inplace=True)
         # newdf = traindf.drop(traindf['区'][traindf['区'].isna()].index,axis=0)
+
+    def col_one_hot(self, col_name):
+        self.data = pd.get_dummies(self.data, columns=[col_name])
 
     def get_data(self):
         return self.data
@@ -114,6 +117,15 @@ class FeatureExtractor(BaseDataHandle):
     @caltime_p1('特征提取')
     def handle(self):
         self.feature_str2int(COL_home_direct)
+
+        # self.col_one_hot(COL_home_direct)
+        # self.col_one_hot(COL_floor)
+        # self.col_one_hot(COL_time)
+        # self.col_one_hot(COL_reside_state)
+        # self.col_one_hot(COL_rent_type)
+        # self.col_one_hot(COL_metro_num)
+        # self.col_one_hot(COL_decorate_situation)
+
         # self.add_home_type()
         pass
 
@@ -179,7 +191,7 @@ class DataManager(object):
 
     @caltime_p1('保存特征数据')
     def save_feature(self):
-        self.data.to_csv(self.get_new_csv_path(self.raw_shape, self.data.shape))
+        self.data.to_csv(self.get_new_csv_path(self.raw_shape, self.data.shape), index=None)
 
     def print_info(self, df):
         print(df.shape)

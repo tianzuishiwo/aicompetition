@@ -151,7 +151,7 @@ class DataManager(object):
 
     @caltime_p1('保存特征数据')
     def save_feature(self):
-        self.data.to_csv(self.get_new_csv_path(self.raw_shape, self.data.shape))
+        self.data.to_csv(self.get_new_csv_path(self.raw_shape, self.data.shape), index=None)
 
     def print_info(self, df):
         print(df.shape)

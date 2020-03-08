@@ -58,7 +58,8 @@ class PubgController(object):
     @caltime_p1('训练集特征-预处理-删除目标列与切分数据')
     def train_pre_process(self):
         y_target = self.data[COL_month_fee]
-        train = self.data.drop([COL_month_fee, COL_index], axis=1)
+        # train = self.data.drop([COL_month_fee, COL_index], axis=1)
+        train = self.data.drop([COL_month_fee], axis=1)
         print(train.head(3))
         print(y_target.head(3))
         self.split(train, y_target)
@@ -84,7 +85,8 @@ class PubgController(object):
     @caltime_p1('测试集特征-预处理')
     def test_pre_process(self):
         self.dataset.X_test_id = self.testdf[COL_order_]
-        self.dataset.X_test = self.testdf.drop([COL_order_, COL_index], axis=1)
+        # self.dataset.X_test = self.testdf.drop([COL_order_, COL_index], axis=1)
+        self.dataset.X_test = self.testdf.drop([COL_order_], axis=1)
         print(f'测试集 shape: {self.dataset.X_test.shape}')
         print(f'测试集 列名: {self.dataset.X_test.columns}')
         # self.dataset.X_test =
@@ -101,27 +103,28 @@ def test_train():
 #     model = MyModel()
 #     model.load_model_trian()
 
-MODE_NAME = 'randomForestRegressor_1583689687.pkl'
+MODE_NAME = 'Xgboost_1583697336.pkl'
 
 
 def load_pkl_and_predict():
     estimator = joblib.load(RENT_PKL_PATH + MODE_NAME)
     testpd = pd.read_csv(USE_TEST_CSV, encoding='utf-8')
     X_test_id = testpd[COL_order_]
-    X_test = testpd.drop([COL_order_, COL_index], axis=1)
+    # X_test = testpd.drop([COL_order_, COL_index], axis=1)
+    X_test = testpd.drop([COL_order_], axis=1)
     y_predict = estimator.predict(X_test)
     result_df = pd.DataFrame(X_test_id)
     result_df['月租金'] = y_predict
     print(f'测试结果文件shape： {result_df.shape}')
     print(f'测试结果文件columns： {result_df.columns}')
     path = RENT_RESULT_PATH + 'local_pkl_' + str(int(time.time())) + '_' + RENT_RESULT_NAME
-    result_df.to_csv(path, encoding='utf-8')
+    result_df.to_csv(path, encoding='utf-8', index=None)
     print('本地加载模型，预测测试集数据完成！ (列名存在编码异常！！！)')
 
 
 def main():
-    test_train()
-    # load_pkl_and_predict()
+    # test_train()
+    load_pkl_and_predict()
 
 
 if __name__ == '__main__':

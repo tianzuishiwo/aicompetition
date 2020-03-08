@@ -12,6 +12,7 @@ from hm.ml.houserent.rent_config import *
 
 FORMAT_ARROW = '-' * 20 + '> '
 
+pd.set_option('mode.chained_assignment', None)
 
 # RENT_RESULT_NAME_PATH
 
@@ -41,7 +42,7 @@ class BaseModel(object):
             print(f'测试结果文件shape： {result_df.shape}')
             print(f'测试结果文件columns： {result_df.columns}')
             if OUTPUT_RESULT_ENABLE:
-                result_df.to_csv(self.get_result_csv_path())
+                result_df.to_csv(self.get_result_csv_path(), index=None)
             else:
                 print('暂不打印结果文件！')
 
@@ -82,7 +83,8 @@ class MyLGBMRegressor(BaseModel):
     def train(self):
         estimator = lgb.LGBMRegressor(objective="regression", num_leaves=31, learning_rate=0.05, n_estimators=20)
         estimator.fit(self.dataset.x_train, self.dataset.y_train,
-                      eval_set=[(self.dataset.x_valid, self.dataset.y_valid)], eval_metric="l1", early_stopping_rounds=5)
+                      eval_set=[(self.dataset.x_valid, self.dataset.y_valid)], eval_metric="l1",
+                      early_stopping_rounds=5)
         # estimator = lgb.LGBMRegressor(boosting_type='gbdt',
         #                               num_leaves=31,
         #                               max_depth=5,
@@ -101,6 +103,7 @@ class MyLGBMRegressor(BaseModel):
         self.print_result(self.model_name, accuracy, result)
         self.save_and_result(estimator)
 
+
 class MyXgboost(BaseModel):
 
     @caltime_p1('Xgboost训练')
@@ -115,6 +118,7 @@ class MyXgboost(BaseModel):
         self.save_and_result(estimator)
         pass
 
+
 class MyModel(object):
 
     def __init__(self, data=None, is_load=False):
@@ -125,4 +129,3 @@ class MyModel(object):
         # MyRandomForestRegressor(self.dataset, 'randomForestRegressor').train()
         # MyLGBMRegressor(self.dataset, 'LGBMRegressor').train()
         MyXgboost(self.dataset, 'Xgboost').train()
-

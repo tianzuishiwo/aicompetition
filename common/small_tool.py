@@ -109,7 +109,7 @@ class CsvSpliter(object):
     def generate_new_csv(self, csv, count, target_file):
         if csv is not None and (count is not None):
             new_csv = csv.iloc[:count, :]
-            new_csv.to_csv(target_file)
+            new_csv.to_csv(target_file, index=None)
             line_count = 30
             print('-' * line_count, '开始', '-' * line_count)
             print(f'保留样本：{target_file}')
