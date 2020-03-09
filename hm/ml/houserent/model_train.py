@@ -1,6 +1,7 @@
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 from xgboost import XGBRegressor
+from sklearn.model_selection import GridSearchCV
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
@@ -114,7 +115,7 @@ class MyLGBMRegressor(BaseModel):
         self.save_and_result(estimator)
 
 
-class MyXgboost(BaseModel):
+class MyXgboostOptimize(BaseModel):
 
     @caltime_p1('Xgboost训练')
     def train(self):
@@ -154,7 +155,55 @@ class MyXgboost(BaseModel):
 }
         :return:
         """
-        estimator = XGBRegressor(learning_rate=0.1, n_estimators=550, max_depth=4, min_child_weight=5, seed=0,
+        # cv_params = {'n_estimators': [400, 500, 600, 700, 800]}
+        # other_params = {'learning_rate': 0.1, 'n_estimators': 500, 'max_depth': 5, 'min_child_weight': 1, 'seed': 0,
+        #                 'subsample': 0.8, 'colsample_bytree': 0.8, 'gamma': 0, 'reg_alpha': 0, 'reg_lambda': 1}
+
+        # model = xgb.XGBRegressor(**other_params)
+        # optimized_GBM = GridSearchCV(estimator=model, param_grid=cv_params, scoring='r2', cv=5, verbose=1)
+        # optimized_GBM.fit(new_train_x, train_y)
+        # evalute_result = optimized_GBM.grid_scores_
+        # print('每轮迭代运行结果:{0}'.format(evalute_result))
+        # print('参数的最佳取值：{0}'.format(optimized_GBM.best_params_))
+        # print('最佳模型得分:{0}'.format(optimized_GBM.best_score_))
+
+        # 调试最佳参数 n_estimators=750,max_depth=7
+        param_grid = {
+            # 'n_estimators': [550, 650, 720, 800, 880]
+            # 'max_depth': [3, 4, 5, 7]
+            'learning_rate': [0.05, 0.1, 0.15]
+        }
+
+        estimator = XGBRegressor(
+            n_estimators=750,
+            # learning_rate=0.1,
+            max_depth=7,
+            min_child_weight=5,
+            gamma=0.1,
+            seed=0, subsample=0.7, colsample_bytree=0.7, reg_alpha=1, reg_lambda=1)
+
+        grid_search_cv = GridSearchCV(estimator=estimator, param_grid=param_grid, cv=3, verbose=1,n_jobs=-1)
+        grid_search_cv.fit(self.dataset.x_train, self.dataset.y_train)
+
+        # grid_search_cv.score()
+        # grid_search_cv.predict()
+        # estimator.fit(self.dataset.x_train, self.dataset.y_train)
+        accuracy = grid_search_cv.score(self.dataset.x_valid, self.dataset.y_valid)
+        y_valid_pre = grid_search_cv.predict(self.dataset.x_valid)
+        result = self.rmse(self.dataset.y_valid, y_valid_pre)
+        self.print_result(self.model_name, accuracy, result)
+        print(f'每轮迭代运行结果: {grid_search_cv.scoring}')
+        print(f'参数的最佳取值: {grid_search_cv.best_params_}')
+        print(f'最佳模型得分: {grid_search_cv.best_score_}')
+        # self.save_and_result(estimator)
+        pass
+
+
+class MyXgboostBest(BaseModel):
+
+    @caltime_p1('Xgboost训练')
+    def train(self):
+        estimator = XGBRegressor(learning_rate=0.1, n_estimators=750, max_depth=7, min_child_weight=5, seed=0,
                                  subsample=0.7, colsample_bytree=0.7, gamma=0.1, reg_alpha=1, reg_lambda=1)
         estimator.fit(self.dataset.x_train, self.dataset.y_train)
         accuracy = estimator.score(self.dataset.x_valid, self.dataset.y_valid)
@@ -162,8 +211,6 @@ class MyXgboost(BaseModel):
         result = self.rmse(self.dataset.y_valid, y_valid_pre)
         self.print_result(self.model_name, accuracy, result)
         self.save_and_result(estimator)
-
-        pass
 
 
 class MyModel(object):
@@ -175,4 +222,21 @@ class MyModel(object):
     def train(self):
         # MyRandomForestRegressor(self.dataset, 'randomForestRegressor').train()
         # MyLGBMRegressor(self.dataset, 'LGBMRegressor').train()
-        MyXgboost(self.dataset, 'Xgboost').train()
+        MyXgboostOptimize(self.dataset, 'Xgboost-optimize').train()
+        # MyXgboostBest(self.dataset, 'Xgboost-best').train()
+
+# class MyXgboost(BaseModel):
+#
+#     @caltime_p1('Xgboost训练')
+#     def train(self):
+#
+#         estimator = XGBRegressor(learning_rate=0.1, n_estimators=550, max_depth=4, min_child_weight=5, seed=0,
+#                                  subsample=0.7, colsample_bytree=0.7, gamma=0.1, reg_alpha=1, reg_lambda=1)
+#         estimator.fit(self.dataset.x_train, self.dataset.y_train)
+#         accuracy = estimator.score(self.dataset.x_valid, self.dataset.y_valid)
+#         y_valid_pre = estimator.predict(self.dataset.x_valid)
+#         result = self.rmse(self.dataset.y_valid, y_valid_pre)
+#         self.print_result(self.model_name, accuracy, result)
+#         self.save_and_result(estimator)
+#
+#         pass

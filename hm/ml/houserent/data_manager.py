@@ -9,7 +9,7 @@ pd.set_option('mode.chained_assignment', None)
 COL_index = 'index'
 COL_order_ = 'id'
 COL_time = 'time'
-COL_area = 'area'
+COL_area = 'area'  # 小区名，之前是area
 COL_area_rent_count = 'area_rent_count'
 COL_floor = 'floor'
 COL_total_floor = 'total_floor'
@@ -37,7 +37,8 @@ COL_parlor_rate = 'parlor_rate'  # 厅/总
 COL_floor_rate = 'floor_rate'  # 楼层比
 COL_home_type = 'home_type'  # 户型
 COL_metro_exist = 'metro_exist'  # 有地铁
-
+COL_location_path_count = 'location_path_count'  # 位置线路数
+COL_area_path_count = 'area_path_count'  # 小区线路数
 
 # COL_ = ''
 
@@ -76,7 +77,6 @@ x_columns=['时间', '新小区名', '小区房屋出租数量', '楼层', '总�
            '站点平均值特征','位置平均值特征'
            
            '小区线路数'(4),'位置线路数'(4),
-           
            '有地铁'(2,3,4),
            '房+卫+厅'(4),
            '卧室面积'(4),
@@ -166,6 +166,8 @@ class FeatureExtractor(BaseDataHandle):
         # self.add_floor_rate() # 楼层比先屏蔽
         self.add_home_type()
         self.add_metro_exist()
+        # self.add_x_path_count(COL_area, COL_area_path_count)  # 有问题，先放
+        # self.add_x_path_count(COL_location, COL_location_path_count)  # 有问题，先放
         pass
 
     def add_home_type(self):
@@ -195,6 +197,23 @@ class FeatureExtractor(BaseDataHandle):
 
     def add_metro_exist(self):
         self.data[COL_metro_exist] = (self.data[COL_metro_station] > -1).map(int)
+
+    def add_x_path_count(self, col_name, new_col_name):
+        # COL_location_path_count = 'location_path_count'  # 位置线路数
+        # COL_area_path_count = 'area_path_count'  # 小区线路数
+
+        # lines_count1 = train[['小区名', '地铁线路']].drop_duplicates().groupby('小区名').count()
+        # lines_count1.columns = ['小区线路数']
+        # train = pd.merge(train, lines_count1, how='left', on=['小区名'])
+
+        lines_count = self.data[[col_name, COL_metro_num]].drop_duplicates().groupby(col_name).count()
+        lines_count.columns = [new_col_name]
+        self.data = pd.merge(self.data, lines_count, how='left', on=[col_name])
+
+        # lines_count = self.data[[COL_area, COL_metro_num]].drop_duplicates().groupby(COL_area).count()
+        # lines_count.columns = [COL_area_path_count]
+        # self.data = pd.merge(self.data, lines_count, how='left', on=[COL_area])
+        pass
 
 
 class ElseHander(BaseDataHandle):
