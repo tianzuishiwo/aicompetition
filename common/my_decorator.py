@@ -1,6 +1,6 @@
 import time, datetime
 # from common.small_tool import get_time_now
-from tianchi.o2o.o2o_config import *
+# from tianchi.o2o.o2o_config import *
 
 CALCULATE_START = 'recorde_start'
 CALCULATE_END = 'recorde_end'
@@ -139,18 +139,18 @@ def print_caltime(start, des):
     # record(func_time_des)
 
 
-def record(des):
-    if CALCULATE_END in des:
-        # print('+'*30,' ',CALCULATE_END)
-        file_path = LOG_PATH + str(time.time()) + '.txt'
-        # print(file_path)
-        # print(caltime_record)
-        with open(file_path, 'w') as f:
-            for line in caltime_record:
-                f.write(line)
-                f.write('\r\n')
-        caltime_record.clear()
-    caltime_record.append(des)
+# def record(des):
+#     if CALCULATE_END in des:
+#         # print('+'*30,' ',CALCULATE_END)
+#         file_path = LOG_PATH + str(time.time()) + '.txt'
+#         # print(file_path)
+#         # print(caltime_record)
+#         with open(file_path, 'w') as f:
+#             for line in caltime_record:
+#                 f.write(line)
+#                 f.write('\r\n')
+#         caltime_record.clear()
+#     caltime_record.append(des)
     # print('-'*25,'添加日志信息')
 
 # decorator N func N
