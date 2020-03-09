@@ -9,7 +9,7 @@ pd.set_option('mode.chained_assignment', None)
 COL_index = 'index'
 COL_order_ = 'id'
 COL_time = 'time'
-COL_area = 'area'  # 小区名，之前是area
+COL_area = 'area'  # 小区名
 COL_area_rent_count = 'area_rent_count'
 COL_floor = 'floor'
 COL_total_floor = 'total_floor'
@@ -41,7 +41,7 @@ COL_location_path_count = 'location_path_count'  # 位置线路数
 COL_area_path_count = 'area_path_count'  # 小区线路数
 
 # COL_ = ''
-
+# 训练集列名
 COLUMNS_TRAIN = [
     # COL_order_,
     # COL_index,
@@ -51,6 +51,7 @@ COLUMNS_TRAIN = [
     COL_metro_num, COL_metro_station, COL_distance, COL_decorate_situation, COL_month_fee,
 ]
 
+# 测试集列名
 COLUMNS_TEST = [
     # COL_index,
     COL_order_, COL_time, COL_area, COL_area_rent_count, COL_floor,
@@ -64,23 +65,7 @@ COLUMNS_TEST = [
 # ['Unnamed: 0', '时间', '小区名', '小区房屋出租数量', '楼层',
 #  '总楼层', '房屋面积', '房屋朝向','居住状态', '卧室数量',
 #  '厅的数量', '卫的数量', '出租方式', '区', '位置',
-#  '地铁线路', '地铁站点', '距离','装修情况', '月租金']
-
-x_columns=['时间', '新小区名', '小区房屋出租数量', '楼层', '总楼层', '房屋面积','居住状态', '卧室数量',
-       '厅的数量', '卫的数量', '出租方式', '区', '位置', '地铁线路', '地铁站点', '距离', '装修情况', 
-       '新朝向', '房+卫+厅', '房/总', '卫/总', '厅/总', '卧室面积', '楼层比', '户型','平均值特征1',
-       '平均值特征2','有地铁','小区线路数','位置线路数','小区条数大于100','小区平均值特征','朝向平均值特征',
-           '站点平均值特征','位置平均值特征']
-           
-           '新小区名', '小区房屋出租数量','新朝向','房+卫+厅', '房/总', '卫/总', '厅/总','卧室面积','户型','平均值特征1',
-       '平均值特征2','有地铁','小区线路数','位置线路数','小区条数大于100','小区平均值特征','朝向平均值特征',
-           '站点平均值特征','位置平均值特征'
-           
-           '小区线路数'(4),'位置线路数'(4),
-           '有地铁'(2,3,4),
-           '房+卫+厅'(4),
-           '卧室面积'(4),
-           
+#  '地铁线路', '地铁站点', '距离','装修情况', '月租金']           
 """
 
 
@@ -96,20 +81,16 @@ class BaseDataHandle(object):
         self.data[col_name][self.data[col_name].isna()] = self.data[col_name].mean()
 
     def fill_value(self, col_name, value):
-        # data[data['metro_num'].isna()]=0
         self.data[col_name][self.data[col_name].isna()] = value
 
     def feature_str2int(self, col_name):
         self.data[col_name] = self.data[col_name].astype('category').cat.codes
 
     def del_col(self, col_name):
-        # 删除列
-        self.data.drop(col_name, axis=1, inplace=True)
+        self.data.drop(col_name, axis=1, inplace=True)   # 删除列
 
-    def del_row(self, col_name):
-        # 删除行，根据空数据
+    def del_row(self, col_name):  # 删除行，根据空数据
         self.data.drop(self.data[col_name][self.data[col_name].isna()].index, axis=0, inplace=True)
-        # newdf = traindf.drop(traindf['区'][traindf['区'].isna()].index,axis=0)
 
     def col_one_hot(self, col_name):
         self.data = pd.get_dummies(self.data, columns=[col_name])
@@ -132,7 +113,6 @@ class MissValuer(BaseDataHandle):
         self.fill_value(COL_reside_state, 0)
         self.fill_value(COL_metro_num, 0)
         self.fill_value(COL_decorate_situation, 0)
-        # data[data['metro_station'].isna()]=data['metro_station'].mean()
 
 
 class AbnormalValuer(BaseDataHandle):
@@ -163,7 +143,7 @@ class FeatureExtractor(BaseDataHandle):
         self.add_room_rate()
         self.add_toilet_rate()
         self.add_parlor_rate()
-        # self.add_floor_rate() # 楼层比先屏蔽
+        # self.add_floor_rate() # 楼层比先 ,有问题，先放
         self.add_home_type()
         self.add_metro_exist()
         # self.add_x_path_count(COL_area, COL_area_path_count)  # 有问题，先放
@@ -171,13 +151,10 @@ class FeatureExtractor(BaseDataHandle):
         pass
 
     def add_home_type(self):
-        # train['户型'] = train[['卧室数量', '厅的数量', '卫的数量']].
-        # apply(lambda x: str(x['卧室数量']) + str(x['厅的数量']) + str(x['卫的数量']),axis=1)
         self.data[COL_home_type] = self.data[[COL_room_count, COL_parlor_count, COL_toilet_count]] \
             .apply(lambda x: str(x[COL_room_count]) + str(x[COL_parlor_count]) + str(x[COL_toilet_count]), axis=1)
 
     def add_room_area(self):
-        #  data['room_area'] = data['home_area']/(data['room_count']+1)
         self.data[COL_room_area] = self.data[COL_home_area] / (self.data[COL_room_count] + 1)
 
     def add_total_rtp(self):
@@ -201,41 +178,27 @@ class FeatureExtractor(BaseDataHandle):
     def add_x_path_count(self, col_name, new_col_name):
         # COL_location_path_count = 'location_path_count'  # 位置线路数
         # COL_area_path_count = 'area_path_count'  # 小区线路数
-
-        # lines_count1 = train[['小区名', '地铁线路']].drop_duplicates().groupby('小区名').count()
-        # lines_count1.columns = ['小区线路数']
-        # train = pd.merge(train, lines_count1, how='left', on=['小区名'])
-
         lines_count = self.data[[col_name, COL_metro_num]].drop_duplicates().groupby(col_name).count()
         lines_count.columns = [new_col_name]
         self.data = pd.merge(self.data, lines_count, how='left', on=[col_name])
-
-        # lines_count = self.data[[COL_area, COL_metro_num]].drop_duplicates().groupby(COL_area).count()
-        # lines_count.columns = [COL_area_path_count]
-        # self.data = pd.merge(self.data, lines_count, how='left', on=[COL_area])
         pass
 
 
 class ElseHander(BaseDataHandle):
-    """
-    关于暂未处理
-    1.以下列暂未one-hot编码
-    onehot 处理：“时间”，“楼层”，“房屋朝向”（dummy），“居住状态”，“出租方式”，‘地铁线路’，“装修情况”
-    """
+    """数据前置处理"""
 
     @caltime_p1('数据前置处理')
     def handle(self):
-        # self.data.columns = COLUMNS
         self.del_col(COL_area)
         pass
 
 
 class DataManager(object):
+    """数据管理类"""
 
     def __init__(self, is_train=True):
         self.data = None
-        # self.is_train = True
-        self.is_train = is_train
+        self.is_train = is_train  # True 训练集 False 测试集
         self.load_data()
         self.raw_shape = self.data.shape
 
@@ -244,7 +207,6 @@ class DataManager(object):
         if self.is_train:
             print('@' * 30, '加载训练集数据')
             self.data = pd.read_csv(USE_TRAIN_PATH)
-            print('')
             self.data.columns = COLUMNS_TRAIN
         else:
             print('@' * 30, '加载测试集数据')
@@ -267,23 +229,21 @@ class DataManager(object):
 
     @caltime_p1('保存特征数据')
     def save_feature(self):
-        self.data.to_csv(self.get_new_csv_path(self.raw_shape, self.data.shape), index=None)
+        self.data.to_csv(self.get_new_csv_path(), index=None)
+        # self.data.to_csv(self.get_new_csv_path(self.raw_shape, self.data.shape), index=None)
 
     def print_info(self, df):
         print(df.shape)
         print(df.columns)
-        # print(df.info())
 
     def pshape(self):
         print(self.data.shape)
 
-    def get_new_csv_path(self, raw_shape, new_shape):
+    def get_new_csv_path(self):
         # 生成文件带有时间戳
-        # time-1000_23_to_333_45.csv
         head = 'train_small.csv'
         if not self.is_train:
             head = 'test_small.csv'
-        # csv_new = f'{head}_{str(int(time.time()))}-{raw_shape[0]}_{raw_shape[1]}_to_{new_shape[0]}_{new_shape[1]}.csv'
         csv_new = head
         print(f'生成特征数据文件(名称写死)： {csv_new}')
         path = RENT_TRAIN_PATH + csv_new
@@ -307,7 +267,7 @@ class DataManager(object):
 
 
 @caltime_p0('数据处理全部流程')
-def test_data():
+def generate_feature_csv():
     train = DataManager(True)
     train.auto()
     del train
@@ -316,7 +276,7 @@ def test_data():
 
 
 def main():
-    test_data()
+    generate_feature_csv()
 
 
 if __name__ == '__main__':
