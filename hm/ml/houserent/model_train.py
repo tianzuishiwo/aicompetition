@@ -70,6 +70,26 @@ class BaseModel(object):
         return np.sqrt(mean_absolute_error(y, y_pre))
 
 
+class MyLightGBM(BaseModel):
+
+    @caltime_p1('LightGBM优化')
+    def train(self):
+        model_lgb = lgb.LGBMRegressor(objective='regression', num_leaves=900,
+                                      learning_rate=0.1, n_estimators=3141, bagging_fraction=0.7,
+                                      feature_fraction=0.6, reg_alpha=0.3, reg_lambda=0.3,
+                                      min_data_in_leaf=18, min_sum_hessian_in_leaf=0.001)
+
+        model_lgb.fit(self.dataset.x_train, self.dataset.y_train)
+        accuracy = model_lgb.score(self.dataset.x_valid, self.dataset.y_valid)
+        y_valid_pre = model_lgb.predict(self.dataset.x_valid)
+        result = self.rmse(self.dataset.y_valid, y_valid_pre)
+        # result = self.rmse(self.dataset.y_valid, self.dataset.x_valid)
+        self.print_result(self.model_name, accuracy, result)
+        # # model_lgb.fit(train, train_label)
+        print(f'accuracy: {accuracy}')
+        pass
+
+
 class MyRandomForestRegressor(BaseModel):
     """回归森林类"""
 
@@ -148,12 +168,12 @@ class MyXgboostBest(BaseModel):
     @caltime_p1('MyXgboostBest训练')
     def train(self):
         estimator = XGBRegressor(
-                                 n_estimators=750,
-                                 learning_rate=0.15,
-                                 max_depth=7,
-                                 min_child_weight=4,
-                                 gamma=0.13,
-                                 reg_alpha=1,seed=0,subsample=0.7, colsample_bytree=0.7,   reg_lambda=1)
+            n_estimators=750,
+            learning_rate=0.15,
+            max_depth=7,
+            min_child_weight=4,
+            gamma=0.13,
+            reg_alpha=1, seed=0, subsample=0.7, colsample_bytree=0.7, reg_lambda=1)
         estimator.fit(self.dataset.x_train, self.dataset.y_train)
         accuracy = estimator.score(self.dataset.x_valid, self.dataset.y_valid)
         y_valid_pre = estimator.predict(self.dataset.x_valid)
@@ -172,9 +192,8 @@ class MyModel(object):
     def train(self):
         """模型训练启动方法"""
         # MyXgboostOptimize(self.dataset, 'Xgboost-optimize').train()  # xgboost调优类
-        MyXgboostBest(self.dataset, 'Xgboost-best').train()  # xgboost最优类（直接跑最优结果）
+        # MyXgboostBest(self.dataset, 'Xgboost-best').train()  # xgboost最优类（直接跑最优结果）
+        MyLightGBM(self.dataset, 'LightGBM-best').train()
 
         # MyRandomForestRegressor(self.dataset, 'randomForestRegressor').train() # 回归森林测试
         # MyLGBMRegressor(self.dataset, 'LGBMRegressor').train()  # LGBMRegressor测试
-
-
