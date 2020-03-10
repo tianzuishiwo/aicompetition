@@ -70,8 +70,9 @@ COLUMNS_TEST = [
 
 
 class BaseDataHandle(object):
-    def __init__(self, df):
+    def __init__(self, df,is_train):
         self.data = df
+        self.is_train = is_train
         self.handle()
 
     def handle(self):
@@ -120,8 +121,11 @@ class AbnormalValuer(BaseDataHandle):
 
     @caltime_p1('剔除异常值')
     def handle(self):
-        self.del_row(COL_district)  # 极少数有空值
-        self.del_row(COL_location)  # 极少数有空值
+        if self.is_train:
+            self.del_row(COL_district)  # 极少数有空值
+            self.del_row(COL_location)  # 极少数有空值
+        else:
+            print('测试集不能删除数据')
 
 
 class FeatureExtractor(BaseDataHandle):
@@ -216,10 +220,10 @@ class DataManager(object):
     @caltime_p1('生成特征数据')
     def generate_feature_df(self):
         self.print_info(self.data)
-        self.data = ElseHander(self.data).get_data()
-        self.data = MissValuer(self.data).get_data()
-        self.data = AbnormalValuer(self.data).get_data()
-        self.data = FeatureExtractor(self.data).get_data()
+        self.data = ElseHander(self.data,self.is_train).get_data()
+        self.data = MissValuer(self.data,self.is_train).get_data()
+        self.data = AbnormalValuer(self.data,self.is_train).get_data()
+        self.data = FeatureExtractor(self.data,self.is_train).get_data()
 
     def auto(self):
         self.generate_feature_df()
