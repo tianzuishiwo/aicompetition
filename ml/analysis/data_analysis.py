@@ -26,8 +26,14 @@ TEST_PATH = ROOT_PATH + 'source/' + TEST_NAME
 
 
 class BaseAnalysis(object):
-    TARGET_NAME = COL_month_fee
     FONT_SIZE = 18
+    TARGET_NAME = COL_month_fee
+    # 连续性特征
+    CONTINUOUS_COLS = [COL_time, COL_area_rent_count, COL_total_floor,
+                       COL_home_area, COL_room_count, COL_parlor_count,
+                       COL_toilet_count, COL_distance]
+    # 与目标值相关性最大列
+    COL_MAX_RELATIONSHIP_WITH_TARGET = None
 
     def __init__(self, data):
         self.data = data
@@ -77,20 +83,30 @@ class BaseAnalysis(object):
         print(miss_data)
         pass
 
+    def plot_boxline_map(self, col_names):
+        print('箱线图待绘制特征列表： ', col_names)
+        for i in range(len(col_names)):
+            plt.figure(figsize=(12, 10))
+            # 绘制箱线图
+            sns.boxplot(y=col_names[i], x=self.TARGET_NAME, data=self.data, orient='h')
+            plt.show()
+        print('箱线图绘制完成！！！')
+        pass
+
     def get_data(self):
         return self.data
 
 
 class RelationshipAnalysis(BaseAnalysis):
-    # 连续性特征
-    CONTINUOUS_COLS = [COL_time, COL_area_rent_count, COL_total_floor, COL_home_area, COL_room_count, COL_parlor_count,
-                       COL_toilet_count, COL_distance]
 
     @caltime_p1('相关性分析')
     def analisis(self):
         self.columns()
-        self.continuous_values()
-
+        # self.continuous_values()
+        # self.heatmap()
+        # self.pearson_relationship()
+        # self.box_line_map()
+        self.outlier_analysis()
         pass
 
     @caltime_p1('通过散点图观察特征和目标值之间的关系-生成多个图例')
@@ -100,6 +116,49 @@ class RelationshipAnalysis(BaseAnalysis):
         for col in continuous_cols:
             sns.jointplot(x=col, y=self.TARGET_NAME, data=self.data, alpha=0.3, size=4)
         plt.show()
+
+    @caltime_p1('皮尔森相关性热力图')
+    def heatmap(self):
+        # 计算皮尔森相关性
+        corrmat = self.data.corr()
+        plt.figure(figsize=(20, 20))
+        sns.heatmap(corrmat, square=True, linewidths=0.1, annot=True)
+        plt.show()
+        pass
+
+    @caltime_p1('特征与目标值皮尔森相关性分析图')
+    def pearson_relationship(self):
+        plt.figure(figsize=(12, 6))
+        corr = self.data.corr()[self.TARGET_NAME][self.CONTINUOUS_COLS].sort_values(ascending=False)
+        corr.plot('barh', figsize=(12, 6), title=f'特征与目标值[{self.TARGET_NAME}] 皮尔森相关性分析图')
+        plt.show()
+
+        self.COL_MAX_RELATIONSHIP_WITH_TARGET = corr.index[0]
+        print('皮尔森相关性(特征与目标值):', type(corr))  # corr 类型为Series
+        print(corr)
+        print('目标值相关性最强特征：  ', "<" * 5, self.COL_MAX_RELATIONSHIP_WITH_TARGET, ">" * 5)
+        pass
+
+    @caltime_p1('绘制箱线图')
+    def box_line_map(self):
+        # new_cols= columns - self.CONTINUOUS_COLS
+        category_cols2 = ['时间', '楼层', '居住状态', '出租方式', '区', '地铁线路', '装修情况']
+        print('这里特征列表写死，需要处理！！！！')
+        self.plot_boxline_map(category_cols2)
+        # self.plot_boxline_map(self.data.columns)
+        pass
+
+    @caltime_p1('异常值分析图')
+    def outlier_analysis(self):
+        corr = self.data.corr()[self.TARGET_NAME][self.CONTINUOUS_COLS].sort_values(ascending=False)
+        col_name = corr.index[0]
+        self.COL_MAX_RELATIONSHIP_WITH_TARGET = col_name
+
+        plt.figure(figsize=(10, 10))
+        # plt.title = f'异常值分析图: {col_name}---{self.TARGET_NAME}'  # 不起作用
+        sns.regplot(x=self.data[col_name], y=self.data[self.TARGET_NAME])
+        plt.show()
+        pass
 
 
 class DataDistribute(BaseAnalysis):
@@ -163,7 +222,7 @@ class AnalysisManager(object):
 
     def start_analysis(self):
         DataDescribe(self.data)
-        DataDistribute(self.data)
+        # DataDistribute(self.data)
         RelationshipAnalysis(self.data)
         pass
 
