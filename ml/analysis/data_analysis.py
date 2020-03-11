@@ -1,6 +1,8 @@
 import os
 from ml.main.config import *
 from common.my_decorator import *
+from ml.analysis.data_analysis_rough import ResearchQuestionData
+
 
 import pandas as pd
 import numpy as np
@@ -71,6 +73,10 @@ class BaseAnalysis(object):
         print(f'{col_name}列的前{5}个数据')
         print(self.data[col_name].head(n))
 
+    def col_value_counts(self, col_name):
+        # 查看某列，关于列内属性的统计，例如：'东' 24749 '南' 41769 '西' 7559 ...
+        self.data[col_name].value_counts()
+
     def miss_rate(self):
         print('构造缺失比例统计表：')
         # 每列的缺失值个数/总行数
@@ -97,15 +103,18 @@ class BaseAnalysis(object):
         return self.data
 
 
+
+
+
 class RelationshipAnalysis(BaseAnalysis):
 
     @caltime_p1('相关性分析')
     def analisis(self):
         self.columns()
-        # self.continuous_values()
-        # self.heatmap()
-        # self.pearson_relationship()
-        # self.box_line_map()
+        self.continuous_values()
+        self.heatmap()
+        self.pearson_relationship()
+        self.box_line_map()
         self.outlier_analysis()
         pass
 
@@ -143,7 +152,7 @@ class RelationshipAnalysis(BaseAnalysis):
     def box_line_map(self):
         # new_cols= columns - self.CONTINUOUS_COLS
         category_cols2 = ['时间', '楼层', '居住状态', '出租方式', '区', '地铁线路', '装修情况']
-        print('这里特征列表写死，需要处理！！！！')
+        print('这里特征列表写死，需要处理（待后期优化）！！！！')
         self.plot_boxline_map(category_cols2)
         # self.plot_boxline_map(self.data.columns)
         pass
@@ -165,7 +174,7 @@ class DataDistribute(BaseAnalysis):
 
     @caltime_p1('数据分布')
     def analisis(self):
-        self.col_head(self.TARGET_NAME)
+        # self.col_head(self.TARGET_NAME)
         self.target_value_distribute()
         self.head()
         self.all_col_distribute()
@@ -221,9 +230,10 @@ class AnalysisManager(object):
         pass
 
     def start_analysis(self):
-        DataDescribe(self.data)
+        # DataDescribe(self.data)
         # DataDistribute(self.data)
-        RelationshipAnalysis(self.data)
+        # RelationshipAnalysis(self.data)
+        ResearchQuestionData(self.data)
         pass
 
     @caltime_p1('加载训练数据')
@@ -241,6 +251,7 @@ def test_something():
 def analysis_run():
     da = AnalysisManager()
     da.start_analysis()
+
 
 
 def main():
