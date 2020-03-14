@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 
 # class ResearchQuestionData(BaseAnalysis):
-class ResearchQuestionData(object):
+class ResearchQuestionDataRough(object):
     """
     深度学习开始了，发现学习节奏太快，这个项目没时间搞了，但是又不能不搞，
     折中方案：

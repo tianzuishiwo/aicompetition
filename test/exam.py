@@ -104,9 +104,41 @@ def code_25():
     print('-' * 25, '25题结束', '-' * 25)
 
 
+a = [1, 3, 5, 7, 9]
+b = [4, 5, 6, 7]
+
+
+def list_intersection():
+    intersection = list(set(a).intersection(set(b)))
+    print("交集： ", intersection)
+    pass
+
+
+def list_union():
+    union = list(set(a).union(set(b)))
+    print("并集： ", union)
+    pass
+
+
+def list_defference():
+    defference = list(set(b).difference(set(a)))
+    print("差集： ", defference)
+    pass
+
+
+def test_list():
+    print('a: ', a)
+    print('b: ', b)
+    list_intersection()
+    list_union()
+    list_defference()
+    pass
+
+
 def main():
-    code_24()
-    code_25()
+    # code_24()
+    # code_25()
+    test_list()
 
 
 if __name__ == '__main__':

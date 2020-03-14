@@ -1,11 +1,17 @@
 import time, datetime
+
 # from common.small_tool import get_time_now
 # from tianchi.o2o.o2o_config import *
 
 CALCULATE_START = 'recorde_start'
 CALCULATE_END = 'recorde_end'
 caltime_record = []
-
+order_num = 1
+LEVEL_0 = "ALL: "
+LEVEL_1 = "- "
+LEVEL_2 = "-- "
+LEVEL_3 = "--- "
+LEVEL_4 = "---- "
 
 # 被装饰方法：有参数 decorator Y func N
 def caltime_p0(*decorator_param):
@@ -114,9 +120,10 @@ def get_delta_des(delta):
         if delta < HOUR:
             des = f' {str(int(delta / MIN))}分{str(delta % MIN)}秒'
         else:
-            des = f' {str(int(delta / HOUR))}小时{str(int(delta % HOUR/ MIN))}分{str(delta % MIN)}秒'
+            des = f' {str(int(delta / HOUR))}小时{str(int(delta % HOUR / MIN))}分{str(delta % MIN)}秒'
     # print(delta, ' ', des)
     return des
+
 
 # get_delta_des(0.00123346)
 # get_delta_des(23.123346)
@@ -126,7 +133,6 @@ def get_delta_des(delta):
 # get_delta_des(4590.00123346)
 # get_delta_des(18234.00123346)
 
-
 def print_caltime(start, des):
     end = time.time()
     delta = end - start
@@ -134,10 +140,11 @@ def print_caltime(start, des):
     #     delta = 0.0
     # delta = round(delta, 2)
     delta_des = get_delta_des(delta)
-    func_time_des = f'>>>>>>>>>> {des} 耗时：{delta_des} '
+    global order_num
+    func_time_des = f'({order_num}) >>>>>>>>>> {des} [耗时：{delta_des}]'
+    order_num = order_num + 1
     print(func_time_des)
     # record(func_time_des)
-
 
 # def record(des):
 #     if CALCULATE_END in des:
@@ -151,7 +158,7 @@ def print_caltime(start, des):
 #                 f.write('\r\n')
 #         caltime_record.clear()
 #     caltime_record.append(des)
-    # print('-'*25,'添加日志信息')
+# print('-'*25,'添加日志信息')
 
 # decorator N func N
 # def caltime(func):
