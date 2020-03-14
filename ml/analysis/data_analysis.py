@@ -21,7 +21,7 @@ warnings.filterwarnings('ignore')  # 忽略一些警告
 
 """
 
-SAVE_IMG = True  # 图例保存到本地
+SAVE_IMG = False  # 图例保存到本地
 IMG_SHOW = not SAVE_IMG
 IMG_SKIP = False  # 跳过所有画图
 
@@ -100,14 +100,14 @@ class BaseAnalysis(BaseObject):
         plt.barh(y_values, x_values)
         plt.xlabel(x_label)
         plt.title(title)
-        self.show_or_save('水平直方图-'+title)
+        self.show_or_save('水平直方图-' + title)
         # self.show_or_save_img(title, True, True)
 
     def boxline(self, x_label, y_label, data):
         """绘制箱线图"""
         plt.figure(figsize=(12, 10))
         sns.boxplot(y=y_label, x=x_label, data=data, orient='h')
-        self.show_or_save('箱线图-' + x_label + 'vs' +y_label )
+        self.show_or_save('箱线图-' + x_label + 'vs' + y_label)
         pass
 
     def show_or_save_img(self, img_name, save_img, show_img, img_skip=False):
@@ -142,7 +142,37 @@ class ResearchQuestionData(BaseAnalysis):
 
     @caltime_p1(LEVEL_1 + '问题数据分析')
     def analisis(self):
+        """
+        老师在这里有许多关于两列的对比：
+        多用以下api， drop_duplicates()  groupby()  value_counts() dropna()等
+        关于业务，这里有太多逻辑可以分析
+        :return:
+        """
+        self.add_new_home_direct()
+
         pass
+
+    @caltime_p1(LEVEL_2 + '新增房屋朝向_0-n')
+    def add_new_home_direct(self):
+        series = self.data[COL_home_direct].value_counts()
+        # series = series[series > 50]
+        print(type(series))
+        print(series)
+        # self.barh(series.index.values, series.values, COL_home_direct, '查看房屋朝向列有哪些值')
+        for i in range(5):
+            self.data['朝向_' + str(i)] = self.data[COL_home_direct].map(lambda x: self.split(x, i))
+        col_names = ["朝向_{}".format(i) for i in range(5)]
+        print(self.data[col_names].info())
+
+    def split(self, text, i):
+        """
+        实现对字符串进行分割,并取出结果中下标i对应的值
+        """
+        items = text.split(" ")
+        if i < len(items):
+            return items[i]
+        else:
+            return np.nan
 
 
 class RelationshipAnalysis(BaseAnalysis):
@@ -279,7 +309,7 @@ class DataDescribe(BaseAnalysis):
         train_missing = train_missing.drop(train_missing[train_missing == 0].index).sort_values(ascending=False)
         miss_data = pd.DataFrame({col_name: train_missing})
         self.barh(miss_data.index.values, miss_data[col_name].values, col_name, map_name)
-        print('构造', map_name,'水平直方图')
+        print('构造', map_name, '水平直方图')
         print(miss_data)
         pass
 
@@ -291,9 +321,9 @@ class AnalysisManager(object):
         pass
 
     def start_analysis(self):
-        DataDescribe(self.data)
-        DataDistribute(self.data)
-        RelationshipAnalysis(self.data)
+        # DataDescribe(self.data)
+        # DataDistribute(self.data)
+        # RelationshipAnalysis(self.data)
         ResearchQuestionData(self.data)
         pass
 
