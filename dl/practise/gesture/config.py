@@ -1,0 +1,9 @@
+BATCH_SIZE = 16*1
+# batch_size = 16 * 1
+# epochs = 6
+EPOCHS = 10
+# EPOCHS = 50
+LEARNING_RATE = 0.001
+IMAGE_SIZE = (224, 224, 3)
+# DATA_RATE = 1
+DATA_RATE = 0.5
