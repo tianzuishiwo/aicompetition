@@ -37,29 +37,31 @@ class ModelManager(object):
             write_images=True,
         )
 
-        self.mode.fit_generator(
+        train_sequence_len = len(self.data_loader.get_train_sequence())
+        self.mode.fit(
             self.data_loader.get_train_sequence(),
             validation_data=self.data_loader.get_test_sequence(),
             max_queue_size=10,
             epochs=EPOCHS,
-            steps_per_epoch=int(len(self.data_loader.get_train_sequence())),
+            steps_per_epoch=int(train_sequence_len),
             verbose=1,
             # workers=int(multiprocessing.cpu_count() * 0.7),
             # use_multiprocessing=True,
             shuffle=True,
             callbacks=[model_checkpoit, tensor_borad,
-                       get_warm_lr(len(self.data_loader.get_train_sequence()))]
+                       get_warm_lr(train_sequence_len * BATCH_SIZE,
+                                   BATCH_SIZE, LEARNING_RATE, EPOCHS, WARMUP_EPOCH)]
         )
 
     def train(self):
         self.compile()
         print(self.mode.summary())
         self.fit()
-        self.saved_model()
+        # self.saved_model()
         pass
 
     def saved_model(self):
-        timedes = int(time.time())
+        timedes = str(int(time.time()))
         path = ROOT_SMODEL_PAHT + timedes
         os.mkdir(path)
         tf.saved_model.save(self.mode, path)
@@ -108,13 +110,17 @@ def main():
 
 
 """
-参数抽取到config
-Tensorboard 调试
-HParams超参数调优
+参数抽取到config ok
+
+HParams超参数调优  （过于耗时，换个项目比如垃圾分类，在台式机上跑）
 某些方法抽取到工具类 sequence，余弦退火
 
-mixup（）调试
+mixup（）调试  方法有问题
+Tensorboard 调试
 
+复习课程
+老师作业
+预习课程
 """
 
 if __name__ == '__main__':
