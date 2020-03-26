@@ -2,13 +2,13 @@ import tensorflow as tf
 from dl.practise.gesture.my_model import MyModel
 from dl.practise.gesture.data_loader import DataLoader
 from dl.practise.gesture.config import *
-from dl.practise.gesture.my_optimizer import WarmUpCosineDecayScheduler
+from dl.practise.gesture.my_optimizer import get_warm_lr
 
 
 class ModelManager(object):
     def __init__(self):
         self.mode = MyModel().get_mode()
-        self.data_loader = DataLoader(BATCH_SIZE,IMAGE_SIZE)
+        self.data_loader = DataLoader(BATCH_SIZE, IMAGE_SIZE)
         pass
 
     def compile(self):
@@ -22,7 +22,7 @@ class ModelManager(object):
     def fit(self):
         # self.clear_logs()
         model_checkpoit = tf.keras.callbacks.ModelCheckpoint(
-            filepath='./hdf5/weights.{epoch:02d}-acc6_{val_acc:.2f}.hdf5',
+            filepath='./hdf5/weights.{epoch:02d}-acc_{val_acc:.2f}.hdf5',
             monitor='val_acc',
             save_best_only=True,
             mode='auto',
@@ -45,28 +45,9 @@ class ModelManager(object):
             # workers=int(multiprocessing.cpu_count() * 0.7),
             # use_multiprocessing=True,
             shuffle=True,
-            callbacks=[model_checkpoit, tensor_borad, self.get_cos_lr()]
+            callbacks=[model_checkpoit, tensor_borad,
+                       get_warm_lr(len(self.data_loader.get_train_sequence()))]
         )
-
-    def get_cos_lr(self):
-        # 余弦退回warmup
-        # 得到总样本数
-        batch_size = BATCH_SIZE
-        sample_count = len(self.data_loader.get_train_sequence()) * batch_size
-
-        # 第二阶段学习率以及总步数
-        learning_rate_base = LEARNING_RATE
-        total_steps = int(EPOCHS * sample_count) / batch_size
-        # 计算第一阶段的步数需要多少 warmup_steps
-        warmup_epoch = 5
-        warmup_steps = int(warmup_epoch * sample_count) / batch_size
-
-        warm_lr = WarmUpCosineDecayScheduler(learning_rate_base=learning_rate_base,
-                                             total_steps=total_steps,
-                                             warmup_learning_rate=0,
-                                             warmup_steps=int(warmup_steps),
-                                             hold_base_rate_steps=0, )
-        return warm_lr
 
     def train(self):
         self.compile()

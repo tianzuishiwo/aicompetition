@@ -1,5 +1,28 @@
 import numpy as np
 import tensorflow as tf
+from dl.practise.gesture.config import *
+
+
+def get_warm_lr(sequence_len):
+    # 余弦退回warmup
+    # 得到总样本数
+    batch_size = BATCH_SIZE
+    # sample_count = len(self.data_loader.get_train_sequence()) * batch_size
+    sample_count = sequence_len * batch_size
+
+    # 第二阶段学习率以及总步数
+    learning_rate_base = LEARNING_RATE
+    total_steps = int(EPOCHS * sample_count) / batch_size
+    # 计算第一阶段的步数需要多少 warmup_steps
+    # warmup_epoch = 5
+    warmup_steps = int(WARMUP_EPOCH * sample_count) / batch_size
+
+    warm_lr = WarmUpCosineDecayScheduler(learning_rate_base=learning_rate_base,
+                                         total_steps=total_steps,
+                                         warmup_learning_rate=0,
+                                         warmup_steps=int(warmup_steps),
+                                         hold_base_rate_steps=0, )
+    return warm_lr
 
 class WarmUpCosineDecayScheduler(tf.keras.callbacks.Callback):
     """带有warnup的余弦退火学习率实现
@@ -90,3 +113,23 @@ def cosine_decay_with_warmup(global_step,
     # 4、如果最后当前到达的步数大于总步数，则归0，否则返回当前的计算出来的学习率（可能是warmup学习率也可能是余弦衰减结果）
 
     return np.where(global_step > total_steps, 0.0, learning_rate)
+
+   # def get_warm_lr(self):
+    #     # 余弦退回warmup
+    #     # 得到总样本数
+    #     batch_size = BATCH_SIZE
+    #     sample_count = len(self.data_loader.get_train_sequence()) * batch_size
+    #
+    #     # 第二阶段学习率以及总步数
+    #     learning_rate_base = LEARNING_RATE
+    #     total_steps = int(EPOCHS * sample_count) / batch_size
+    #     # 计算第一阶段的步数需要多少 warmup_steps
+    #     # warmup_epoch = 5
+    #     warmup_steps = int(WARMUP_EPOCH * sample_count) / batch_size
+    #
+    #     warm_lr = WarmUpCosineDecayScheduler(learning_rate_base=learning_rate_base,
+    #                                          total_steps=total_steps,
+    #                                          warmup_learning_rate=0,
+    #                                          warmup_steps=int(warmup_steps),
+    #                                          hold_base_rate_steps=0, )
+    #     return warm_lr
