@@ -2,6 +2,7 @@ import tensorflow as tf
 from dl.practise.gesture.my_model import MyModel
 from dl.practise.gesture.data_loader import DataLoader
 from dl.practise.gesture.config import *
+from dl.practise.gesture.dl_utils import *
 from dl.practise.gesture.my_optimizer import get_warm_lr
 import os
 from common.my_decorator import *
@@ -21,10 +22,14 @@ class ModelManager(object):
             metrics=['acc']
         )
 
+    def get_path(self):
+        path = ROOT_MODEL_FILE_PATH + get_cur_timedes() + MODEL_WEIGHT_NAME
+        return path
+
     def fit(self):
         # self.clear_logs()
         model_checkpoit = tf.keras.callbacks.ModelCheckpoint(
-            filepath=MODEL_FILE_PATH,
+            filepath=self.get_path(),
             monitor=MONITOR_VALUE,
             save_best_only=True,
             mode='auto',
@@ -57,12 +62,12 @@ class ModelManager(object):
         self.compile()
         print(self.mode.summary())
         self.fit()
-        # self.saved_model()
+        self.saved_model()
         pass
 
     def saved_model(self):
-        timedes = str(int(time.time()))
-        path = ROOT_SMODEL_PAHT + timedes
+        # timedes = str(int(time.time()))
+        path = ROOT_SMODEL_PAHT + get_cur_timedes()
         os.mkdir(path)
         tf.saved_model.save(self.mode, path)
         print('保存模型成功！')
@@ -105,7 +110,7 @@ def test_mkdir():
 
 def main():
     # test_predict1()
-    test_mkdir()
+    # test_mkdir()
     pass
 
 

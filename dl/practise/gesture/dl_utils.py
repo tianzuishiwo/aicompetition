@@ -5,6 +5,12 @@ import math
 from dl.practise.gesture.config import *
 from PIL import Image
 import tensorflow as tf
+import time
+
+
+def get_cur_timedes():
+    ft1 = '%Y%m%d-%H_%M_%S'
+    return time.strftime(ft1)
 
 
 def get_random_eraser(p=0.5, s_l=0.02, s_h=0.4, r_1=0.3, r_2=1 / 0.3, v_l=0, v_h=255, pixel_level=False):
