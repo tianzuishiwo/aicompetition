@@ -1,4 +1,5 @@
-ROOT_DATA_PATH = '/Users/wushaohua/my/hm/数据集/深度学习/Sign-Language-Digits-Dataset-master/Dataset/'
+ROOT_DATA_PATH = '/Users/wushaohua/my/data/Sign-Language-Digits-Dataset-master/Dataset/'
+# ROOT_DATA_PATH = '/Users/wushaohua/my/hm/数据集/深度学习/Sign-Language-Digits-Dataset-master/Dataset/'
 
 ROOT_MODEL_FILE_PATH = './hdf5/'
 MODEL_WEIGHT_NAME = '_weights.{epoch:02d}-acc_{val_acc:.2f}.hdf5'
